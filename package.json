@@ -1,0 +1,25 @@
+{
+  "name": "psy-motion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Moteur de motion design éditorial pour vidéos TikTok de psychologie du quotidien",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "planche": "node scripts/run.mjs planche",
+    "render": "node scripts/run.mjs render",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/schibsted-grotesk": "5.2.8",
+    "@remotion/cli": "4.0.540",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.540",
+    "zod": "4.6.7",
+    "@remotion/zod-types": "4.0.540"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
