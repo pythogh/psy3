@@ -21,6 +21,7 @@ Le moteur calcule seul les positions, les tailles et la caméra. Le signe `|` fo
 | `textStyle` | `giant`, `hook`, `title`, `body` | auto : giant pour words, title au-delà de 7 mots, sinon hook |
 | `textPos` | `top`, `center`, `bottom` | `center` pour words, sinon `bottom` |
 | `decor` | `none`, `circle`, `ring`, `dashedRing`, `square` | `circle` pour words, sinon `none` |
+| `shadow` | `false` pour retirer les ombres sur ce plan uniquement | ombres actives |
 | `narration` | texte de la voix off s'il diffère du texte affiché | le texte |
 | `startAt` | seconde de la voix off où commence le plan | — |
 
