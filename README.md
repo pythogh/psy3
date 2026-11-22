@@ -17,12 +17,14 @@ Pour une nouvelle vidéo, on ajoute un fichier. On ne copie pas le projet.
 npm install          # une fois, au début (et après une mise à jour du projet)
 npm run dev          # Studio : aperçu + panneau de réglages
 npm run planche      # planche contact : une image par plan → out/<id>-planche.png
+npm run voix         # voix off gratuite (synthèse locale) + calage automatique des plans
+npm run synchro      # voix enregistrée (la tienne, ElevenLabs…) → calage automatique des plans
 npm run render       # export MP4 → out/<id>.mp4
 ```
 
 `<id>` est l'identifiant de la vidéo, écrit dans son fichier (`id="..."`).
 S'il y a plusieurs vidéos dans le projet, précise laquelle :
-`npm run planche -- <id>` ou `npm run render -- <id>`.
+`npm run planche -- <id>`, `npm run voix -- <id>`, etc.
 
 ---
 
@@ -41,8 +43,9 @@ src/
     text/              ← texte cinétique (révélé mot par mot)
   engine/              ← assemblage : plans, transitions, caméra, timeline, planche
   theme/               ← police, marges, courbes de mouvement
-public/                ← fichiers statiques : texture de grain, voix off
-scripts/run.mjs        ← lanceur des commandes planche et render
+public/                ← fichiers statiques : texture de grain, voix off (public/voix/)
+.voix/                 ← outils de voix installés automatiquement (non envoyé sur GitHub)
+scripts/               ← commandes planche, render, voix, synchro
 RECETTES.md            ← catalogue des recettes et de leurs options
 INSTRUCTIONS_PROJET_CLAUDE.md ← consignes à coller dans un Projet Claude
 ```
@@ -61,7 +64,9 @@ Ce qu'on ne modifie que pour ajouter un nouvel objet ou un nouvel effet : tout l
 3. **Validation** : `npm run planche`, puis regarde l'image produite dans `out/`.
 4. **Retouches** : petites retouches dans le Studio (`npm run dev`) ; corrections importantes
    dans le Projet Claude, en citant les numéros de plans.
-5. **Export** : `npm run render`, puis publication.
+5. **Voix** : `npm run voix` (synthèse gratuite) ou `npm run synchro` (voix enregistrée). Les plans
+   se calent sur la voix. Écoute dans le Studio, puis refais une planche si besoin.
+6. **Export** : `npm run render`, puis publication.
 
 ---
 
@@ -99,10 +104,48 @@ sur plusieurs lignes : c'est normal.
 
 ## Voix off
 
-1. Place le fichier MP3 ou WAV dans `public/` (par exemple `public/voix/<id>.mp3`).
-2. Dans le Studio, active `audio` et indique `src` : `voix/<id>.mp3`.
-3. Cale les plans sur la voix : ajuste `duration`, ou renseigne `startAt`
-   (seconde de la voix off où le plan commence).
+La voix lit la narration de chaque plan (champ `narration`, sinon le texte affiché, sans les `|`).
+Les deux commandes écrivent ensuite dans le fichier de la vidéo le début (`startAt`) et la durée
+de chaque plan, et branchent l'audio. Le texte suit alors exactement la voix, pauses comprises.
+
+**Voix de synthèse gratuite : `npm run voix`**
+- Moteur par défaut : Chatterbox (open source, licence MIT), qui tourne sur le processeur, sans carte graphique.
+- La voix lit des **phrases entières** (les plans sont regroupés jusqu'au point), pour une intonation
+  naturelle ; Whisper retrouve ensuite où commence chaque plan.
+- Produit `public/voix/<id>.wav`. Sans carte graphique, compter plusieurs minutes par vidéo.
+- Premier lancement : installation automatique (longue, environ 2 à 3 Go).
+
+Options :
+
+| option | effet |
+|---|---|
+| `--expressivite 0.6` | relief de la voix : 0.3 posé, 0.9 très expressif |
+| `--rythme 0.35` | plus bas = débit plus lent et posé (0.2 à 0.6) |
+| `--reference fichier.wav` | voix à imiter : extrait propre de 8 à 10 s (par défaut : voix française de la démo Chatterbox) |
+| `--prises 3` | 3 versions de chaque phrase, rangées dans `.voix/prises/<id>/` pour les écouter |
+| `--choix 4:2,7:3` | garde la prise 2 de la phrase 4, la prise 3 de la phrase 7 (rien n'est régénéré) |
+| `--moteur kokoro` | ancien moteur, très rapide mais plus mécanique (`--vitesse 1.1` pour son débit) |
+| `--sans-whisper` | calage approximatif, sans transcription |
+
+Seules les phrases dont le texte a changé sont régénérées : relancer après une retouche est rapide.
+
+**Bien écrire pour la voix** : la ponctuation pilote l'intonation. Virgules pour les respirations,
+points de suspension pour une phrase qui reste en l'air avant une chute, point d'interrogation pour
+une montée, nombres en lettres, phrases de moins de 20 mots, pas de points d'exclamation.
+Le champ `narration` d'un plan permet de ponctuer pour l'oreille sans changer le texte affiché.
+
+**Voix enregistrée : `npm run synchro`**
+1. Dépose le fichier dans `public/voix/<id>.mp3` (ou `.wav`, `.m4a`).
+2. `npm run synchro` : Whisper (transcription locale, gratuite) repère chaque mot et cale les plans.
+- Pour un autre nom de fichier : `npm run synchro -- <id> --audio public/voix/fichier.mp3`.
+- Premier lancement : compilation de Whisper et téléchargement de son modèle (plusieurs minutes, environ 500 Mo).
+- L'enregistrement doit lire le texte des plans ; de petites différences ne gênent pas.
+
+Les deux commandes réécrivent le bloc des plans de la vidéo (comme le Studio) : les commentaires
+qui s'y trouvaient, comme les numéros `/* 12 */`, disparaissent. Après une modification du texte,
+relance simplement la commande.
+
+Pour caler à la main : ajuste `duration`, ou renseigne `startAt` (seconde où le plan commence).
 
 ---
 
