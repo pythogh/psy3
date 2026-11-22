@@ -223,6 +223,7 @@ const recipeCommon = {
   enter: z.enum(["cut", "slam", "fade", "rise", "slide", "zoom", "wipe"]).optional().describe("Transition d'entrée (défaut : cut)"),
   camera: z.enum(["push", "pull", "still", "drift", "punch"]).optional().describe("Mouvement de caméra"),
   decor: z.enum(["none", "circle", "ring", "dashedRing", "square"]).optional().describe("Grande forme coupée par le cadre"),
+  shadow: z.boolean().optional().describe("Ombres portées sur ce plan (défaut : oui). false = sans ombre"),
   startAt: z.number().min(0).max(600).optional().describe("Début dans la voix off (s)"),
 };
 
