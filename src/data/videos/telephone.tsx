@@ -47,7 +47,7 @@ export const TelephoneComposition: React.FC = () => (
         { recipe: "phone", bg: "cream", duration: 1.6, text: "Parfois, il y a | un message.", enter: "rise", notify: true, camera: "pull" },
         { recipe: "phone", bg: "ink", duration: 1.1, text: "Souvent, | rien.", enter: "slam", textPos: "top", textStyle: "giant", motion: "none" },
         { recipe: "pattern", bg: "cream", duration: 1.5, text: "C’est justement | cette incertitude", seed: "incertitude" },
-        { recipe: "reach", bg: "ink", duration: 1.4, text: "qui entretient | le geste.", enter: "slam" },
+        { recipe: "phoneRow", bg: "ink", duration: 1.4, text: "qui entretient | le geste.", enter: "slam", count: 3 },
         { recipe: "words", bg: "accent", duration: 1.0, text: "En psychologie, | on parle de", enter: "slam", textStyle: "title", decor: "none" },
         { recipe: "dot", bg: "accent", duration: 2.0, text: "Récompense | intermittente", textStyle: "giant", camera: "punch" },
         { recipe: "phoneGrid", bg: "cream", duration: 2.4, text: "quand on ne sait pas quand la récompense arrive,", enter: "slide" },
@@ -57,7 +57,7 @@ export const TelephoneComposition: React.FC = () => (
 
         { recipe: "dot", bg: "ink", duration: 2.4, text: "Ton cerveau ne réagit pas seulement au message.", enter: "zoom" },
         { recipe: "dot", bg: "cream", duration: 2.0, text: "Il réagit à | la possibilité", enter: "slam", mode: "fillToEmpty" },
-        { recipe: "words", bg: "accent", duration: 2.6, text: "d’un | message.", enter: "slam", textPos: "top", decor: "none" },
+        { recipe: "phone", bg: "accent", duration: 2.6, text: "d’un | message.", enter: "slam", textPos: "top", screen: "on", notify: true, motion: "pop" },
 
         { recipe: "ground", bg: "cream", duration: 1.9, text: "Avec le temps, | le geste", enter: "slide" },
         { recipe: "ground", bg: "cream", duration: 1.7, text: "se détache de | toute intention.", pace: "fast", camera: "drift" },
