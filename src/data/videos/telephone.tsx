@@ -64,7 +64,7 @@ export const TelephoneComposition: React.FC = () => (
         { recipe: "context", bg: "ink", duration: 1.2, text: "Un ascenseur,", enter: "slam", kind: "elevator" },
         { recipe: "context", bg: "accent", duration: 1.2, text: "une file | d’attente,", enter: "slam", kind: "queue" },
         { recipe: "context", bg: "cream", duration: 1.4, text: "une seconde | d’ennui :", enter: "slam", kind: "hourglass" },
-        { recipe: "reach", bg: "ink", duration: 1.6, text: "la main part", enter: "slam", textStyle: "giant" },
+        { recipe: "phone", bg: "ink", duration: 1.6, text: "la main | part", enter: "slam", textStyle: "giant", screen: "unlock", motion: "pop", camera: "punch" },
         { recipe: "words", bg: "accent", duration: 2.2, text: "avant la | décision.", enter: "slam" },
 
         { recipe: "timeline", bg: "cream", duration: 2.0, text: "Des chercheurs | l’ont observé :", enter: "wipe", part: "start" },
