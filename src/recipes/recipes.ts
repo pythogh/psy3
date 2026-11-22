@@ -186,6 +186,7 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
     bg,
     enter: s.enter && s.enter !== "cut" ? { type: s.enter, duration: s.enter === "slam" ? 0.35 : 0.4 } : undefined,
     camera,
+    shadow: s.shadow,
     layers,
     text,
   };
