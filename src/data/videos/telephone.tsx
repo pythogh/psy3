@@ -55,8 +55,8 @@ export const TelephoneComposition: React.FC = () => (
         /* 16 */ { recipe: "pattern", bg: "cream", duration: 1.7, text: "et l’habitude | résiste mieux", rewards: 0, seed: "resiste" },
         /* 17 */ { recipe: "phone", bg: "accent", duration: 2.0, text: "à l’absence | de résultat.", enter: "slam", screen: "on", motion: "none", textPos: "top" },
 
-        /* 18 */ { recipe: "dot", bg: "ink", duration: 3.7, text: "Ton cerveau ne réagit pas seulement au message.", enter: "zoom" },
-        /* 19 */ { recipe: "dot", bg: "cream", duration: 2.1, text: "Il réagit à | la possibilité", enter: "slam", mode: "fillToEmpty" },
+        /* 18 */ { recipe: "dot", bg: "ink", duration: 3.7, text: "Ton cerveau ne réagit pas seulement au message.", enter: "zoom", shadow: false },
+        /* 19 */ { recipe: "dot", bg: "cream", duration: 2.1, text: "Il réagit à | la possibilité", enter: "slam", mode: "fillToEmpty", shadow: false },
         /* 20 */ { recipe: "phone", bg: "accent", duration: 1.2, text: "d’un | message.", enter: "slam", textPos: "top", screen: "on", notify: true, motion: "pop" },
 
         /* 21 */ { recipe: "ground", bg: "cream", duration: 2.1, text: "Avec le temps, | le geste", enter: "slide" },
