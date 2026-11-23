@@ -14,8 +14,12 @@ export const parseArgs = (argv) => {
   const opts = {};
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i].startsWith("--")) opts[argv[i].slice(2)] = argv[i + 1], i++;
-    else positional.push(argv[i]);
+    if (argv[i].startsWith("--")) {
+      const next = argv[i + 1];
+      // Une option sans valeur (ex. --essai, --lister) vaut "1"
+      if (next === undefined || next.startsWith("--")) opts[argv[i].slice(2)] = "1";
+      else (opts[argv[i].slice(2)] = next), i++;
+    } else positional.push(argv[i]);
   }
   return { id: positional[0], opts };
 };
@@ -79,9 +83,9 @@ export const narrationOf = (shot) =>
  * Écrit les nouveaux timings dans le fichier de la vidéo, avec le même mécanisme que le Studio.
  * starts[i] = seconde où commence le plan i dans l'audio.
  */
-export const writeTimings = async ({ file, id, props, starts, audioSrc, audioDuration }) => {
+export const writeTimings = async ({ file, id, props, starts, audioSrc, audioDuration, extra = {} }) => {
   const { setCompositionDefaultProps } = require("@remotion/codemods");
-  starts = [0, ...starts.slice(1)]; // la vidéo commence toujours par le premier plan
+  if (starts.length) starts = [0, ...starts.slice(1)]; // la vidéo commence toujours par le premier plan
   const shots = props.shots.map((shot, i) => {
     const start = round(starts[i]);
     const next = starts[i + 1];
@@ -90,7 +94,7 @@ export const writeTimings = async ({ file, id, props, starts, audioSrc, audioDur
     else duration = round(Math.max(shot.duration, audioDuration - starts[i] + 0.8)); // dernier plan : garde sa respiration
     return { ...shot, startAt: start, duration: Math.max(0.3, duration) };
   });
-  const next = { ...props, audio: { ...(props.audio ?? {}), src: audioSrc }, shots };
+  const next = { ...props, ...extra, audio: { ...(props.audio ?? {}), src: audioSrc }, shots };
   const contents = readFileSync(file, "utf8");
   const result = setCompositionDefaultProps({
     project: { files: { [file]: contents }, rootDir: ROOT },

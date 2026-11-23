@@ -273,8 +273,24 @@ export const recipeShotSchema = z.discriminatedUnion("recipe", [
 
 /* ── Vidéo ───────────────────────────────────────────────────────── */
 
+export const voixSchema = z
+  .object({
+    id: z.string().optional().describe("Identifiant de la voix ElevenLabs"),
+    nom: z.string().optional().describe("Nom de la voix (pour s'y retrouver)"),
+    stabilite: z.number().min(0).max(1).optional().describe("Plus bas = plus vivant, plus haut = plus régulier (défaut 0.45)"),
+    style: z.number().min(0).max(1).optional().describe("Accentuation du style de la voix (défaut 0.2)"),
+    vitesse: z.number().min(0.7).max(1.2).optional().describe("Débit (défaut 1.0)"),
+    modele: z.string().optional().describe("Modèle ElevenLabs (défaut eleven_multilingual_v2)"),
+  })
+  .describe("Réglages de la voix off, enregistrés par npm run voix");
+
 export const videoSchema = z.object({
   title: z.string(),
+  script: z
+    .array(z.string())
+    .optional()
+    .describe("Texte DIT par la voix off, un paragraphe par ligne. Indépendant du texte affiché des plans"),
+  voix: voixSchema.optional(),
   planche: z.boolean().optional().describe("Afficher la planche contact (une image par plan) au lieu de la vidéo"),
   style: styleSchema,
   audio: z

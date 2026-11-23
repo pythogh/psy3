@@ -57,16 +57,16 @@ Ce qu'on ne modifie que pour ajouter un nouvel objet ou un nouvel effet : tout l
 
 ## Fabriquer une vidéo
 
-1. **Écriture** : dans le Projet Claude (consignes : `INSTRUCTIONS_PROJET_CLAUDE.md`),
-   donne un thème → script + découpage → validation → Claude livre `src/data/videos/<id>.tsx`.
+1. **Script** : dans le Projet Claude (consignes : `INSTRUCTIONS_PROJET_CLAUDE.md`), donne un thème
+   → Claude livre `src/data/videos/<id>.tsx` avec le script dit et aucun plan.
 2. **Ajout au projet** : dépose le fichier dans `src/data/videos/`, puis déclare-le dans
    `src/data/index.tsx` (une ligne d'import et une balise, sur le modèle de celles déjà présentes).
-3. **Validation** : `npm run planche`, puis regarde l'image produite dans `out/`.
-4. **Retouches** : petites retouches dans le Studio (`npm run dev`) ; corrections importantes
+3. **Voix** : `npm run voix -- <id>`, écoute, corrige le script, relance (voir « Voix off »).
+4. **Découpage** : audio validé → Claude renvoie le bloc des plans, à coller dans `shots`.
+5. **Calage et validation** : `npm run voix -- <id>` (0 crédit), puis `npm run planche -- <id>`.
+6. **Retouches** : petites retouches dans le Studio (`npm run dev`) ; corrections importantes
    dans le Projet Claude, en citant les numéros de plans.
-5. **Voix** : `npm run voix` (synthèse gratuite) ou `npm run synchro` (voix enregistrée). Les plans
-   se calent sur la voix. Écoute dans le Studio, puis refais une planche si besoin.
-6. **Export** : `npm run render`, puis publication.
+7. **Export** : `npm run render -- <id>`, puis publication.
 
 ---
 
@@ -102,64 +102,50 @@ sur plusieurs lignes : c'est normal.
 
 ---
 
-## Voix off
+## Voix off : d'abord la voix, ensuite les images
 
-La voix lit la narration de chaque plan (champ `narration`, sinon le texte affiché, sans les `|`).
-Les deux commandes écrivent ensuite dans le fichier de la vidéo le début (`startAt`) et la durée
-de chaque plan, et branchent l'audio. Le texte suit alors exactement la voix, pauses comprises.
+La vidéo a deux textes distincts :
+- **`script`** : le texte DIT par la voix, un paragraphe par ligne, écrit pour l'oreille ;
+- **`text` de chaque plan** : le texte AFFICHÉ, court, qui reprend quelques mots du script.
 
-**Voix de synthèse : `npm run voix`** (moteur par défaut : ElevenLabs)
+Ordre de travail :
+1. Le Projet Claude écrit le script → fichier de la vidéo avec `script` rempli et `shots: []`.
+2. `npm run voix -- --voix Atma` : génère la voix. Écoute `public/voix/<id>.wav`, corrige le script
+   dans le fichier, relance : seuls les paragraphes modifiés sont régénérés.
+3. Audio validé → le Projet Claude fait le découpage (bloc `shots` à coller).
+4. `npm run voix` : l'audio est en cache (0 crédit), les plans sont calés sur la voix.
+5. `npm run planche`, puis `npm run render`.
 
-Le script entier est lu en une seule fois, pour une intonation continue. ElevenLabs renvoie l'instant
-de chaque mot : les plans sont calés exactement, en quelques secondes. Produit `public/voix/<id>.mp3`.
+**Mise en place ElevenLabs (une fois)** : compte gratuit sur elevenlabs.io, clé d'API (autorisations
+« Text to Speech » et « Voices : Read »), enregistrée comme secret Codespaces `ELEVENLABS_API_KEY`
+(puis redémarrer le Codespace) ou collée seule dans `.voix/cle-elevenlabs.txt`.
 
-Mise en place, une seule fois :
-1. Crée un compte gratuit sur elevenlabs.io, puis une clé d'API (autorisations « Text to Speech » et
-   « Voices : Read »).
-2. Enregistre-la comme secret Codespaces nommé `ELEVENLABS_API_KEY` (paramètres GitHub → Codespaces →
-   Secrets, en l'autorisant pour ton dépôt), puis redémarre le Codespace.
-   Variante : colle la clé seule dans `.voix/cle-elevenlabs.txt` (jamais envoyé sur GitHub).
-3. `npm run voix -- --lister` affiche les voix de ton compte. Avec le compte gratuit, seules les voix
-   marquées ✓ (voix par défaut d'ElevenLabs, ou voix créées avec « Voice Design ») sont utilisables
-   par l'API ; celles de la bibliothèque sont réservées aux comptes payants. Les voix ✓ parlent
-   français grâce au modèle multilingue.
-
-Options ElevenLabs :
+**Options de `npm run voix`** :
 
 | option | effet |
 |---|---|
-| `--voix <identifiant>` | voix à utiliser (voir `--lister`) |
+| `--lister` | voix de ton compte ; ✓ = utilisable avec le compte gratuit |
+| `--voix Atma` | voix à utiliser (nom ou identifiant) ; enregistrée dans la vidéo pour la suite |
+| `--essai` | génère seulement le 1er paragraphe → `public/voix/essai-<voix>-<réglages>.wav` (≈ 200 crédits) |
+| `--essai "Une phrase."` | génère seulement cette phrase |
 | `--stabilite 0.45` | plus bas = plus vivant et varié, plus haut = plus régulier |
 | `--style 0.2` | accentuation du style de la voix (0 à 1) |
 | `--vitesse 1.0` | débit, de 0.7 à 1.2 |
-| `--prises 3` | 3 versions complètes, à écouter dans `public/voix/<id>-prise-N.mp3` |
-| `--choix 2` | garde la prise 2 (aucun crédit consommé) |
+| `--prise 2` | autre version de chaque paragraphe (nouvelle génération) |
+| `--oui` | ne pas demander confirmation avant de consommer des crédits |
 
-Crédits : environ 1 crédit par caractère, soit environ 1 000 par vidéo ; l'offre gratuite en donne
-10 000 par mois. Une voix déjà générée pour un texte identique est réutilisée sans rien consommer.
-L'offre gratuite demande de créditer ElevenLabs dans la publication (par exemple « Voix : ElevenLabs »)
-et exclut tout usage commercial.
+Les réglages utilisés sont enregistrés dans le champ `voix` de la vidéo (modifiable dans le Studio) :
+les lancements suivants les reprennent sans option.
 
-Moteurs locaux, gratuits mais plus lents ou plus mécaniques : `--moteur chatterbox` (options
-`--expressivite`, `--rythme`, `--reference`, `--prises`, `--choix 4:2,7:3`) et `--moteur kokoro`.
+**Économiser les crédits** (≈ 1 crédit par caractère, 10 000 par mois en gratuit) : la commande affiche
+le coût et demande confirmation avant toute génération payante ; régler la voix
+et les réglages avec `--essai` ; ne corriger que les paragraphes nécessaires ; une génération déjà faite
+(même texte, même voix, mêmes réglages) est réutilisée sans rien consommer, même d'une vidéo à l'autre.
+L'offre gratuite demande de créditer ElevenLabs (« Voix : ElevenLabs ») et exclut tout usage commercial.
 
-**Bien écrire pour la voix** : la ponctuation pilote l'intonation. Virgules pour les respirations,
-points de suspension pour une phrase qui reste en l'air avant une chute, point d'interrogation pour
-une montée, nombres en lettres, phrases de moins de 20 mots, pas de points d'exclamation.
-Le champ `narration` d'un plan permet de ponctuer pour l'oreille sans changer le texte affiché.
-
-**Voix enregistrée : `npm run synchro`**
-1. Dépose le fichier dans `public/voix/<id>.mp3` (ou `.wav`, `.m4a`).
-2. `npm run synchro` : Whisper (transcription locale, gratuite) repère chaque mot et cale les plans.
-- Pour un autre nom de fichier : `npm run synchro -- <id> --audio public/voix/fichier.mp3`.
-- Premier lancement : compilation de Whisper et téléchargement de son modèle (plusieurs minutes, environ 500 Mo).
-- L'enregistrement doit lire le texte des plans ; de petites différences ne gênent pas.
-
-Les deux commandes réécrivent le bloc des plans de la vidéo (comme le Studio) : les commentaires
-qui s'y trouvaient, comme les numéros `/* 12 */`, disparaissent. Après une modification du texte,
-relance simplement la commande.
-
-Pour caler à la main : ajuste `duration`, ou renseigne `startAt` (seconde où le plan commence).
+**Autres sources de voix** :
+- `npm run synchro` : une voix enregistrée ailleurs, déposée dans `public/voix/<id>.mp3`, calée par Whisper.
+- `--moteur chatterbox` ou `--moteur kokoro` : synthèse locale gratuite, plus lente ou plus mécanique.
 
 ---
 

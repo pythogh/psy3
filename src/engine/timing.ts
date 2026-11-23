@@ -74,6 +74,8 @@ export const calculateVideoMetadata = ({ props }: { props: VideoData }) => {
     const { width, height } = plancheSize(props.shots.length);
     return { durationInFrames: 1, fps: DEFAULT_FPS, width, height };
   }
+  // Vidéo sans plans (script seul, avant le découpage) : une seconde de fond vide
+  if (props.shots.length === 0) return { durationInFrames: DEFAULT_FPS, fps: DEFAULT_FPS, width: 1080, height: 1920 };
   return { durationInFrames: totalDurationInFrames(props, DEFAULT_FPS), fps: DEFAULT_FPS, width: 1080, height: 1920 };
 };
 

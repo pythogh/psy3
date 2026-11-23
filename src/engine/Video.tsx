@@ -108,6 +108,9 @@ export const Video: React.FC<VideoData> = (video) => {
     );
   }
   const timeline = buildTimeline(shots, fps);
+  if (timeline.length === 0) {
+    return <AbsoluteFill style={{ backgroundColor: theme.palettes.cream.bg }} />;
+  }
   return (
     <ThemeProvider theme={theme}>
       <AbsoluteFill style={{ backgroundColor: theme.palettes.cream.bg }}>
