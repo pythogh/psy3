@@ -7,7 +7,9 @@
     "dev": "remotion studio src/index.ts",
     "planche": "node scripts/run.mjs planche",
     "render": "node scripts/run.mjs render",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "voix": "node scripts/voix.mjs",
+    "synchro": "node scripts/synchro.mjs"
   },
   "dependencies": {
     "@fontsource/schibsted-grotesk": "5.2.8",
@@ -16,7 +18,9 @@
     "react-dom": "19.1.0",
     "remotion": "4.0.540",
     "zod": "4.6.7",
-    "@remotion/zod-types": "4.0.540"
+    "@remotion/zod-types": "4.0.540",
+    "@remotion/codemods": "4.0.540",
+    "@remotion/install-whisper-cpp": "4.0.540"
   },
   "devDependencies": {
     "@types/react": "19.1.8",

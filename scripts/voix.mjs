@@ -3,13 +3,17 @@
 // (intonation naturelle), puis cale automatiquement chaque plan sur la voix.
 //
 // Options (toutes facultatives) :
-//   --moteur chatterbox | kokoro   (défaut : chatterbox)
+//   --moteur elevenlabs | chatterbox | kokoro   (défaut : elevenlabs)
+//   --lister                       ElevenLabs : affiche les voix de ton compte et leur identifiant
+//   --voix <identifiant>           ElevenLabs : voix à utiliser
+//   --stabilite 0.45               ElevenLabs : plus bas = plus vivant et varié, plus haut = plus régulier
+//   --style 0.2                    ElevenLabs : accentuation du style de la voix (0 à 1)
+//   --vitesse 1.0                  ElevenLabs et Kokoro : débit (ElevenLabs : 0.7 à 1.2)
 //   --expressivite 0.6             Chatterbox : relief de la voix (0.3 posé → 0.9 très expressif)
 //   --rythme 0.35                  Chatterbox : plus bas = débit plus lent et posé (0.2 à 0.6)
 //   --reference chemin.wav         Chatterbox : voix de référence à imiter (8 à 10 s, propre)
 //   --prises 3                     génère 3 versions de chaque phrase, à écouter
 //   --choix 4:2,7:3                garde la prise 2 de la phrase 4 et la prise 3 de la phrase 7
-//   --vitesse 1.0                  Kokoro : débit
 //   --sans-whisper                 calage approximatif, sans transcription
 import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -19,6 +23,7 @@ import { finished } from "node:stream/promises";
 import { alignSegments, words } from "./lib/align.mjs";
 import { findVideo, loadProps, narrationOf, parseArgs, printTimings, writeTimings } from "./lib/video.mjs";
 import { ensureWhisper, transcribeWords } from "./lib/whisper.mjs";
+import { listVoices, synthesize } from "./lib/elevenlabs.mjs";
 
 const DIR = path.resolve(".voix");
 const ENGINES = {
@@ -106,9 +111,18 @@ const proportionalStarts = (groups, segments, gStarts, gDurations) => {
 };
 
 // ── Programme ─────────────────────────────────────────────────────────────────
-const { id: wanted, opts } = parseArgs(process.argv.slice(2).map((a) => (a === "--sans-whisper" ? ["--sans-whisper", "1"] : [a])).flat());
+const FLAGS = ["--sans-whisper", "--lister"];
+const { id: wanted, opts } = parseArgs(process.argv.slice(2).map((a) => (FLAGS.includes(a) ? [a, "1"] : [a])).flat());
+const engineName = opts.moteur ?? "elevenlabs";
+if (engineName === "elevenlabs" && opts.lister) {
+  await listVoices();
+  process.exit(0);
+}
 const { file, id } = findVideo(wanted, "voix");
-const engineName = opts.moteur ?? "chatterbox";
+if (engineName === "elevenlabs") {
+  await runElevenLabs();
+  process.exit(0);
+}
 if (!ENGINES[engineName]) {
   console.log(`\nMoteur inconnu : ${engineName}. Choix possibles : ${Object.keys(ENGINES).join(", ")}\n`);
   process.exit(1);
@@ -191,3 +205,50 @@ if (takes > 1) {
   console.log(`Puis : npm run voix -- ${id} --prises ${takes} --choix 3:2,5:1   (rien n'est régénéré)`);
 }
 console.log("");
+
+// ── ElevenLabs : tout le script en une demande, calage par l'horodatage renvoyé ──
+async function runElevenLabs() {
+  const props = await loadProps(file);
+  const segments = props.shots.map(narrationOf);
+  const text = segments.join(" ");
+  const takes = Math.max(1, Number(opts.prises ?? 1));
+  const chosen = Math.min(Math.max(1, Number(opts.choix ?? 1)), takes);
+  const common = {
+    text,
+    voice: opts.voix ?? "21m00Tcm4TlvDq8ikWAM",
+    model: opts.modele ?? "eleven_multilingual_v2",
+    settings: {
+      stability: Number(opts.stabilite ?? 0.45),
+      similarity_boost: 0.75,
+      style: Number(opts.style ?? 0.2),
+      use_speaker_boost: true,
+      speed: Number(opts.vitesse ?? 1.0),
+    },
+    cacheDir: path.join(DIR, "prises", id),
+  };
+  if (!opts.voix) console.log("  Aucune voix choisie : voix par défaut. Pour choisir : npm run voix -- --lister");
+  console.log(`→ Voix ElevenLabs : ${segments.length} plans, ${text.length} caractères${takes > 1 ? `, ${takes} prises` : ""}.`);
+
+  const results = [];
+  for (let t = 1; t <= takes; t++) results.push(await synthesize({ ...common, take: t }));
+  mkdirSync("public/voix", { recursive: true });
+  if (takes > 1) {
+    results.forEach((r, i) => writeFileSync(`public/voix/${id}-prise-${i + 1}.mp3`, r.mp3));
+    console.log(`  Prises à écouter : public/voix/${id}-prise-1.mp3 à -prise-${takes}.mp3`);
+  }
+  const { mp3, heard, duration } = results[chosen - 1];
+  writeFileSync(`public/voix/${id}.mp3`, mp3);
+
+  const { starts, matched } = alignSegments(segments, heard);
+  const shots = await writeTimings({
+    file, id, props,
+    starts: starts.map((s) => Math.max(0, s - 0.05)), // le texte apparaît une fraction avant le mot
+    audioSrc: `voix/${id}.mp3`,
+    audioDuration: duration,
+  });
+  printTimings(shots);
+  console.log(`\n✓ Voix : public/voix/${id}.mp3 (${duration.toFixed(1)} s, prise ${chosen}) — calage sur ${Math.round(matched * 100)} % des mots.`);
+  console.log(`✓ Timings écrits dans ${path.relative(process.cwd(), file)}.`);
+  if (takes > 1) console.log(`  Pour garder une autre prise : npm run voix -- ${id} --prises ${takes} --choix 2   (aucun crédit consommé)`);
+  console.log("  Pense à créditer la voix dans ta publication, par exemple « Voix : ElevenLabs ».\n");
+}

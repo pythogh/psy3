@@ -108,26 +108,38 @@ La voix lit la narration de chaque plan (champ `narration`, sinon le texte affic
 Les deux commandes écrivent ensuite dans le fichier de la vidéo le début (`startAt`) et la durée
 de chaque plan, et branchent l'audio. Le texte suit alors exactement la voix, pauses comprises.
 
-**Voix de synthèse gratuite : `npm run voix`**
-- Moteur par défaut : Chatterbox (open source, licence MIT), qui tourne sur le processeur, sans carte graphique.
-- La voix lit des **phrases entières** (les plans sont regroupés jusqu'au point), pour une intonation
-  naturelle ; Whisper retrouve ensuite où commence chaque plan.
-- Produit `public/voix/<id>.wav`. Sans carte graphique, compter plusieurs minutes par vidéo.
-- Premier lancement : installation automatique (longue, environ 2 à 3 Go).
+**Voix de synthèse : `npm run voix`** (moteur par défaut : ElevenLabs)
 
-Options :
+Le script entier est lu en une seule fois, pour une intonation continue. ElevenLabs renvoie l'instant
+de chaque mot : les plans sont calés exactement, en quelques secondes. Produit `public/voix/<id>.mp3`.
+
+Mise en place, une seule fois :
+1. Crée un compte gratuit sur elevenlabs.io, puis une clé d'API (autorisations « Text to Speech » et
+   « Voices : Read »).
+2. Enregistre-la comme secret Codespaces nommé `ELEVENLABS_API_KEY` (paramètres GitHub → Codespaces →
+   Secrets, en l'autorisant pour ton dépôt), puis redémarre le Codespace.
+   Variante : colle la clé seule dans `.voix/cle-elevenlabs.txt` (jamais envoyé sur GitHub).
+3. `npm run voix -- --lister` affiche les voix de ton compte. Pour une voix française : bibliothèque de
+   voix d'ElevenLabs → filtre « French » → « Add to My Voices », puis relance `--lister`.
+
+Options ElevenLabs :
 
 | option | effet |
 |---|---|
-| `--expressivite 0.6` | relief de la voix : 0.3 posé, 0.9 très expressif |
-| `--rythme 0.35` | plus bas = débit plus lent et posé (0.2 à 0.6) |
-| `--reference fichier.wav` | voix à imiter : extrait propre de 8 à 10 s (par défaut : voix française de la démo Chatterbox) |
-| `--prises 3` | 3 versions de chaque phrase, rangées dans `.voix/prises/<id>/` pour les écouter |
-| `--choix 4:2,7:3` | garde la prise 2 de la phrase 4, la prise 3 de la phrase 7 (rien n'est régénéré) |
-| `--moteur kokoro` | ancien moteur, très rapide mais plus mécanique (`--vitesse 1.1` pour son débit) |
-| `--sans-whisper` | calage approximatif, sans transcription |
+| `--voix <identifiant>` | voix à utiliser (voir `--lister`) |
+| `--stabilite 0.45` | plus bas = plus vivant et varié, plus haut = plus régulier |
+| `--style 0.2` | accentuation du style de la voix (0 à 1) |
+| `--vitesse 1.0` | débit, de 0.7 à 1.2 |
+| `--prises 3` | 3 versions complètes, à écouter dans `public/voix/<id>-prise-N.mp3` |
+| `--choix 2` | garde la prise 2 (aucun crédit consommé) |
 
-Seules les phrases dont le texte a changé sont régénérées : relancer après une retouche est rapide.
+Crédits : environ 1 crédit par caractère, soit environ 1 000 par vidéo ; l'offre gratuite en donne
+10 000 par mois. Une voix déjà générée pour un texte identique est réutilisée sans rien consommer.
+L'offre gratuite demande de créditer ElevenLabs dans la publication (par exemple « Voix : ElevenLabs »)
+et exclut tout usage commercial.
+
+Moteurs locaux, gratuits mais plus lents ou plus mécaniques : `--moteur chatterbox` (options
+`--expressivite`, `--rythme`, `--reference`, `--prises`, `--choix 4:2,7:3`) et `--moteur kokoro`.
 
 **Bien écrire pour la voix** : la ponctuation pilote l'intonation. Virgules pour les respirations,
 points de suspension pour une phrase qui reste en l'air avant une chute, point d'interrogation pour
