@@ -119,8 +119,10 @@ Mise en place, une seule fois :
 2. Enregistre-la comme secret Codespaces nommé `ELEVENLABS_API_KEY` (paramètres GitHub → Codespaces →
    Secrets, en l'autorisant pour ton dépôt), puis redémarre le Codespace.
    Variante : colle la clé seule dans `.voix/cle-elevenlabs.txt` (jamais envoyé sur GitHub).
-3. `npm run voix -- --lister` affiche les voix de ton compte. Pour une voix française : bibliothèque de
-   voix d'ElevenLabs → filtre « French » → « Add to My Voices », puis relance `--lister`.
+3. `npm run voix -- --lister` affiche les voix de ton compte. Avec le compte gratuit, seules les voix
+   marquées ✓ (voix par défaut d'ElevenLabs, ou voix créées avec « Voice Design ») sont utilisables
+   par l'API ; celles de la bibliothèque sont réservées aux comptes payants. Les voix ✓ parlent
+   français grâce au modèle multilingue.
 
 Options ElevenLabs :
 

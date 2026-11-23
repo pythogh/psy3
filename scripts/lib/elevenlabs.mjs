@@ -7,7 +7,8 @@ import path from "node:path";
 
 const API = "https://api.elevenlabs.io/v1";
 const KEY_FILE = path.resolve(".voix/cle-elevenlabs.txt");
-const DEFAULT_VOICE = "21m00Tcm4TlvDq8ikWAM"; // voix prédéfinie « Rachel », utilisée si aucune n'est choisie
+// Catégories de voix utilisables par l'API avec un compte gratuit (les voix de la bibliothèque ne le sont pas)
+const FREE_OK = ["premade", "generated", "cloned"];
 
 export const getKey = () => {
   const key = process.env.ELEVENLABS_API_KEY || (existsSync(KEY_FILE) ? readFileSync(KEY_FILE, "utf8").trim() : "");
@@ -33,27 +34,48 @@ const call = async (url, init) => {
 const explain = async (res) => {
   const body = await res.text();
   if (res.status === 401) return "clé refusée : vérifie qu'elle est complète et qu'elle autorise « Text to Speech ».";
+  if (/library voices/i.test(body))
+    return "cette voix vient de la bibliothèque, réservée aux comptes payants via l'API. Choisis une voix marquée ✓ dans : npm run voix -- --lister";
   if (res.status === 429) return "trop de demandes ou quota du mois atteint. Réessaie plus tard.";
   if (/quota|credits/i.test(body)) return "crédits insuffisants pour ce texte ce mois-ci.";
   return `erreur ${res.status} : ${body.slice(0, 200)}`;
 };
 
-/** Affiche les voix disponibles sur le compte, avec leur identifiant. */
-export const listVoices = async () => {
+const fetchVoices = async () => {
   const res = await call(`${API}/voices`, { headers: { "xi-api-key": getKey() } });
   if (!res.ok) {
     console.log(`\n✗ Liste des voix impossible : ${await explain(res)}`);
     console.log("  (Il faut que la clé autorise la lecture des voix : « Voices → Read ».)\n");
     process.exit(1);
   }
-  const { voices } = await res.json();
-  console.log("\nVoix disponibles sur ton compte :\n");
-  voices.forEach((v) => {
-    const labels = Object.values(v.labels ?? {}).join(", ");
-    console.log(`  ${v.voice_id}   ${v.name}${labels ? `  (${labels})` : ""}`);
-  });
+  return (await res.json()).voices;
+};
+
+/** Affiche les voix du compte ; ✓ = utilisable par l'API avec un compte gratuit. */
+export const listVoices = async () => {
+  const voices = await fetchVoices();
+  console.log("\nVoix de ton compte (✓ = utilisable avec le compte gratuit) :\n");
+  voices
+    .sort((a, b) => FREE_OK.includes(b.category) - FREE_OK.includes(a.category))
+    .forEach((v) => {
+      const ok = FREE_OK.includes(v.category) ? "✓" : "✗";
+      const labels = Object.values(v.labels ?? {}).filter(Boolean).join(", ");
+      console.log(`  ${ok}  ${v.voice_id}   ${v.name}${labels ? `  (${labels})` : ""}`);
+    });
   console.log("\nUtilise-en une avec : npm run voix -- --voix <identifiant>");
-  console.log("Pour une voix française : bibliothèque de voix d'ElevenLabs → filtre « French » → « Add to My Voices ».\n");
+  console.log("Les voix ✓ parlent français avec le modèle multilingue, même si elles sont décrites en anglais.\n");
+};
+
+/** Voix par défaut : la première voix utilisable gratuitement du compte. */
+export const defaultVoice = async () => {
+  const voices = await fetchVoices();
+  const v = voices.find((x) => x.category === "premade") ?? voices.find((x) => FREE_OK.includes(x.category));
+  if (!v) {
+    console.log("\n✗ Aucune voix utilisable avec le compte gratuit. Vois : npm run voix -- --lister\n");
+    process.exit(1);
+  }
+  console.log(`  Aucune voix choisie : « ${v.name} » (${v.voice_id}). Pour en choisir une : npm run voix -- --lister`);
+  return v.voice_id;
 };
 
 /**

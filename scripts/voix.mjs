@@ -23,7 +23,7 @@ import { finished } from "node:stream/promises";
 import { alignSegments, words } from "./lib/align.mjs";
 import { findVideo, loadProps, narrationOf, parseArgs, printTimings, writeTimings } from "./lib/video.mjs";
 import { ensureWhisper, transcribeWords } from "./lib/whisper.mjs";
-import { listVoices, synthesize } from "./lib/elevenlabs.mjs";
+import { defaultVoice, listVoices, synthesize } from "./lib/elevenlabs.mjs";
 
 const DIR = path.resolve(".voix");
 const ENGINES = {
@@ -215,7 +215,7 @@ async function runElevenLabs() {
   const chosen = Math.min(Math.max(1, Number(opts.choix ?? 1)), takes);
   const common = {
     text,
-    voice: opts.voix ?? "21m00Tcm4TlvDq8ikWAM",
+    voice: opts.voix ?? (await defaultVoice()),
     model: opts.modele ?? "eleven_multilingual_v2",
     settings: {
       stability: Number(opts.stabilite ?? 0.45),
@@ -226,7 +226,6 @@ async function runElevenLabs() {
     },
     cacheDir: path.join(DIR, "prises", id),
   };
-  if (!opts.voix) console.log("  Aucune voix choisie : voix par défaut. Pour choisir : npm run voix -- --lister");
   console.log(`→ Voix ElevenLabs : ${segments.length} plans, ${text.length} caractères${takes > 1 ? `, ${takes} prises` : ""}.`);
 
   const results = [];
