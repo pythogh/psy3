@@ -50,7 +50,7 @@ Réponses courtes. Ne relis pas et ne réécris pas le code du moteur. Si une id
 - Le titre nomme clairement le sujet (le comportement ou l’objet concerné) ET pique la curiosité : une question en « tu » que le spectateur se pose déjà, ou une promesse de réponse. Jamais de formule abstraite qu’on ne comprend pas sans avoir vu la vidéo. Exemple validé : « Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone ? ».
 - Titre en textStyle "hook" s’il est court, "title" s’il est long, en haut, lisible en petit sur un téléphone.
 - Deux ou trois éléments qui annoncent la DA et le sujet : la recette la plus emblématique de la vidéo, un fond fort (accent ou ink), un decor qui n’est pas derrière le texte.
-- La mascotte peut porter la vignette : recipe "mascot", size "large", position "bottom" (le titre passe en haut), humeur qui colle au sujet, fond ink ou accent (sauge).
+- La mascotte peut porter la vignette : recipe "mascot", size "large", position "center", textPos "top", humeur qui colle au sujet, fond ink ou accent (sauge), et style: { ...style, progressBar: false, textTop: 340 }.
 - Si la vignette demande plusieurs objets combinés qu’aucune recette ne sait faire, signale « nouvelle recette possible : cover ».
 
 # Format d’un plan

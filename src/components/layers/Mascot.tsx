@@ -23,6 +23,7 @@ const BODY_PATH = `
   C -48,-42 -42,-48 -36,-53
   C -26,-62 -12,-66 0,-62 Z
 `;
+const STEM_PATH = "M 0,-62 C -1,-73 3,-82 9,-86";
 
 // Écailles en quinconce (petits chevrons arrondis)
 const SCALES_PATH = [
@@ -37,6 +38,8 @@ const SCALES_PATH = [
   .map(([sx, sy]) => `M ${sx - 5.5},${sy + 2.2} Q ${sx},${sy - 3.2} ${sx + 5.5},${sy + 2.2}`)
   .join(" ");
 
+const INK = "#1C1A19";
+const PAPER = "#F3ECE0";
 const RISO_RED = "#E0485A";
 const RISO_STEM = "#8C6D53";
 const RISO_ORANGE = "#E87A3D";
@@ -186,7 +189,11 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
   const t = shotT - enterAt;
   if (t < 0) return null;
 
-  const ink = onDark ? "#F2EFE9" : "#1C1A19";
+  // Le litchi garde toujours son trait d'encre foncé (même personnage sur tous les fonds).
+  // Sur fond sombre, il est posé comme un autocollant : papier crème sous la couleur.
+  // Seuls les accessoires, qui flottent sur le fond, passent en clair.
+  const ink = INK;
+  const accInk = onDark ? PAPER : INK;
 
   // Apparition cinématique amortie
   const enter = interpolate(t, [0, 0.85], [0, 1], {
@@ -252,11 +259,20 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
         cy={90}
         rx={30 - floatY * 0.4}
         ry={3.5}
-        fill={ink}
-        opacity={(onDark ? 0.22 : 0.14) * enter}
+        fill={onDark ? PAPER : INK}
+        opacity={(onDark ? 0.12 : 0.14) * enter}
       />
 
       <g transform={`translate(0 ${floatY}) rotate(${tilt})`}>
+        {/* Fond sombre : support papier crème avec un liseré, comme un autocollant */}
+        {onDark ? (
+          <g>
+            <path d={STEM_PATH} stroke={PAPER} strokeWidth={11} fill="none" strokeLinecap="round" />
+            <circle cx={9.5} cy={-86.5} r={6} fill={PAPER} />
+            <path d={BODY_PATH} fill={PAPER} stroke={PAPER} strokeWidth={16} strokeLinejoin="round" />
+          </g>
+        ) : null}
+
         {/* Couche couleur Risographie volontairement décalée */}
         <g transform={`translate(${5 + lookX * 0.15} ${4 + lookY * 0.15})`}>
           <path d={BODY_PATH} fill={RISO_RED} opacity={0.9} />
@@ -272,7 +288,7 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
           strokeLinecap="round"
         />
         <path
-          d="M 0,-62 C -1,-73 3,-82 9,-86"
+          d={STEM_PATH}
           stroke={ink}
           strokeWidth={2.6}
           fill="none"
@@ -307,7 +323,7 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
         </g>
 
         {/* Accessoires contextuels en style Riso */}
-        <Accessory mood={mood} pop={pop} t={t} ink={ink} />
+        <Accessory mood={mood} pop={pop} t={t} ink={accInk} />
       </g>
     </svg>
   );

@@ -103,9 +103,9 @@ export const TelephoneVignette: React.FC = () => (
     calculateMetadata={calculateVideoMetadata}
     defaultProps={{
       title,
-      style: { ...style, progressBar: false },
+      style: { ...style, progressBar: false, textTop: 340 },
       shots: [
-        /* 0 */ { recipe: "mascot", bg: "ink", duration: 2, text: "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone\u00A0?", textStyle: "title", mood: "perplexe", size: "large", position: "bottom" },
+        /* 0 */ { recipe: "mascot", bg: "ink", duration: 2, text: "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone\u00A0?", textStyle: "title", textPos: "top", mood: "perplexe", size: "large", position: "center" },
       ],
     }}
   />

@@ -20,7 +20,7 @@ export const baseTheme = {
     accent: { bg: "#B5470F", fg: "#141210", accent: "#EDE5D3", muted: "#8C360B", shadow: "#141210", screen: "#2A2622" },
   } as Record<"cream" | "ink" | "accent", Palette>,
   font: {
-    family: '"Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif',
+    family: '"Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif',
   },
   // Échelle typographique (px, canvas 1080 × 1920). La taille se réduit seule si un mot ne tient pas.
   type: {

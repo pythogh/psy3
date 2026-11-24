@@ -12,15 +12,16 @@
     "synchro": "node scripts/synchro.mjs"
   },
   "dependencies": {
+    "@fontsource/bricolage-grotesque": "^5.3.0",
     "@fontsource/schibsted-grotesk": "5.2.8",
     "@remotion/cli": "4.0.540",
+    "@remotion/codemods": "4.0.540",
+    "@remotion/install-whisper-cpp": "4.0.540",
+    "@remotion/zod-types": "4.0.540",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "remotion": "4.0.540",
-    "zod": "4.6.7",
-    "@remotion/zod-types": "4.0.540",
-    "@remotion/codemods": "4.0.540",
-    "@remotion/install-whisper-cpp": "4.0.540"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/react": "19.1.8",
