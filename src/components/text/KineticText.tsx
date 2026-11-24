@@ -1,7 +1,7 @@
 import React from "react";
 import type { ShotText } from "../../data/types";
 import { usePalette, useTheme } from "../../theme/ThemeContext";
-import { mix, ramp } from "../layers/anim";
+import { mix, ramp, springy } from "../layers/anim";
 
 const WORDS_PER_SECOND = 7; // débit de révélation par défaut (plus rapide que la voix)
 const WORD_IN = 0.22; // durée d'apparition d'un mot (s)
@@ -20,13 +20,18 @@ const fitFontSize = (words: string[], size: number, weight: number, family: stri
 /**
  * Texte révélé mot par mot : chaque mot monte depuis un masque.
  * Une fois complet, le bloc continue de dériver lentement : il n'est jamais figé.
+ * Style « term » : la notion est posée sur une étiquette crème légèrement penchée,
+ * cerclée d'encre, avec la couche de couleur décalée dessous (comme un autocollant).
  */
 export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = ({ item, t, d }) => {
   const theme = useTheme();
   const pal = usePalette();
-  const style = theme.type[item.style ?? "title"];
-  const { width, marginX, textTop, safeBottom, height } = theme.layout;
-  const maxWidth = width - 2 * marginX;
+  const styleName = item.style ?? "title";
+  const style = theme.type[styleName];
+  const isTerm = styleName === "term";
+  const { width, marginX, textTop, safeBottom } = theme.layout;
+  // L'étiquette prend de la place autour du texte : on réserve sa marge intérieure
+  const maxWidth = width - 2 * marginX - (isTerm ? 120 : 0);
 
   const lines = item.text.split(/\s*\|\s*|\n/).map((l) => l.split(" ").filter(Boolean));
   const words = lines.flat();
@@ -44,6 +49,24 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
         ? { bottom: safeBottom }
         : { top: textTop, bottom: safeBottom, display: "flex", flexDirection: "column", justifyContent: "center" };
 
+  // Étiquette : toujours crème et encre (comme un autocollant), quel que soit le fond
+  const paper = theme.palettes.cream.bg;
+  const ink = theme.palettes.cream.fg;
+  const pop = isTerm ? Math.max(0, springy(t, Math.max(0, at - 0.05), 0.5)) : 1;
+  const label: React.CSSProperties = isTerm
+    ? {
+        display: "inline-block",
+        background: paper,
+        color: ink,
+        border: `6px solid ${ink}`,
+        borderRadius: 18,
+        padding: "0.12em 0.32em 0.16em",
+        boxShadow: `${theme.shadow.dx * 1.6}px ${theme.shadow.dy * 1.6}px 0 ${pal.shadow}`,
+        transform: `rotate(-2.5deg) scale(${pop})`,
+        transformOrigin: "20% 60%",
+      }
+    : {};
+
   let k = 0;
   return (
     <div style={{ position: "absolute", left: marginX, right: marginX, ...box, height: pos === "center" ? undefined : "auto" }}>
@@ -58,22 +81,24 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
           color: pal[item.color ?? "fg"],
         }}
       >
-        {lines.map((line, li) => (
-          <div key={li} style={{ display: "flex", flexWrap: "wrap", columnGap: "0.24em" }}>
-            {line.map((word, wi) => {
-              const i = k++;
-              const start = at + (words.length > 1 ? (spread * i) / (words.length - 1) : 0);
-              const p = ramp(t, start, WORD_IN);
-              return (
-                <span key={wi} style={{ display: "inline-block", overflow: "hidden", padding: "0.1em 0 0.08em", margin: "-0.1em 0 -0.08em" }}>
-                  <span style={{ display: "inline-block", transform: `translateY(${(1 - p) * 110}%)`, whiteSpace: "pre" }}>
-                    {word}
+        <div style={label}>
+          {lines.map((line, li) => (
+            <div key={li} style={{ display: "flex", flexWrap: "wrap", columnGap: "0.24em" }}>
+              {line.map((word, wi) => {
+                const i = k++;
+                const start = at + (words.length > 1 ? (spread * i) / (words.length - 1) : 0);
+                const p = ramp(t, start, WORD_IN);
+                return (
+                  <span key={wi} style={{ display: "inline-block", overflow: "hidden", padding: "0.1em 0 0.08em", margin: "-0.1em 0 -0.08em" }}>
+                    <span style={{ display: "inline-block", transform: `translateY(${(1 - p) * 110}%)`, whiteSpace: "pre" }}>
+                      {word}
+                    </span>
                   </span>
-                </span>
-              );
-            })}
-          </div>
-        ))}
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

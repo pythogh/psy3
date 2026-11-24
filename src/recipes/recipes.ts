@@ -145,7 +145,8 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
       break;
     }
     case "context":
-      layers = [{ type: "ground", y: 960, context: { kind: s.kind, x: 330 }, phone: { x: 800, scale: 0.5, pops: [{ at: 0.3, hold: 60 }] } }];
+      // Le décor seul, centré, qui surgit du sol (sans téléphone)
+      layers = [{ type: "ground", y: 1000, context: { kind: s.kind, x: 540 } }];
       break;
     case "reach":
       layers = [{ type: "reach", x: 540, y: vy - 20, scale: 0.85, at: 0.4 }];

@@ -2,11 +2,15 @@
   "name": "psy-motion",
   "version": "1.0.0",
   "private": true,
-  "description": "Moteur de motion design éditorial pour vidéos TikTok de psychologie du quotidien",
+  "description": "Moteur de motion design éditorial pour les vidéos TikTok de Psycholitchi (psychologie du quotidien)",
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "planche": "node scripts/run.mjs planche",
     "render": "node scripts/run.mjs render",
+    "vignette": "node scripts/run.mjs vignette",
+    "export": "node scripts/run.mjs export",
+    "verifier": "node scripts/run.mjs verifier",
+    "telecharger": "node scripts/run.mjs telecharger",
     "typecheck": "tsc --noEmit",
     "voix": "node scripts/voix.mjs",
     "synchro": "node scripts/synchro.mjs"

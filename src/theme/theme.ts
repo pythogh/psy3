@@ -29,6 +29,7 @@ export const baseTheme = {
     title: { size: 88, weight: 700, lineHeight: 1.02, tracking: -0.03 },
     body: { size: 60, weight: 600, lineHeight: 1.12, tracking: -0.015 },
     note: { size: 34, weight: 500, lineHeight: 1.3, tracking: 0 },
+    term: { size: 124, weight: 800, lineHeight: 1.0, tracking: -0.02 }, // notion clé, sur une étiquette
   },
   layout: {
     width: 1080,
@@ -60,10 +61,11 @@ export type ThemeOverride = DeepPartial<Theme>;
 /** Construit le thème complet à partir du style réglable dans le Studio. */
 export const styleToTheme = (style: {
   palettes: Theme["palettes"];
-  textSizes: Record<TextStyleName, number>;
+  textSizes: Partial<Record<TextStyleName, number>>;
   shadow: { dx: number; dy: number };
   grain: number;
   riso?: { wobble: number; boil: boolean; speckle: boolean };
+  textTop?: number;
 }): Theme => {
   const t: Theme = JSON.parse(JSON.stringify(baseTheme));
   t.palettes = style.palettes;
@@ -73,6 +75,7 @@ export const styleToTheme = (style: {
   t.shadow = style.shadow;
   t.grain = { opacity: style.grain };
   if (style.riso) t.riso = style.riso;
+  if (style.textTop) t.layout.textTop = style.textTop;
   return t;
 };
 

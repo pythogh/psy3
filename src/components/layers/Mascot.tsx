@@ -42,8 +42,6 @@ const INK = "#1C1A19";
 const PAPER = "#F3ECE0";
 const RISO_RED = "#E0485A";
 const RISO_STEM = "#8C6D53";
-const RISO_ORANGE = "#E87A3D";
-const RISO_BLUE = "#7FAEC9";
 
 const Face: React.FC<{ mood: MascotMood; blink: number; ink: string }> = ({
   mood,
@@ -129,7 +127,7 @@ const Accessory: React.FC<{
           fontSize={34}
           fontWeight={800}
           fontFamily="Georgia, serif"
-          fill={RISO_ORANGE}
+          fill={RISO_RED}
         >
           ?
         </text>
@@ -172,7 +170,7 @@ const Accessory: React.FC<{
       "M 0,-10 C 4,-3 7,1 7,5 A 7,7 0 0 1 -7,5 C -7,1 -4,-3 0,-10 Z";
     return (
       <g transform={`translate(46 ${-26 + slide}) scale(${pop})`}>
-        <path d={dropPath} fill={RISO_BLUE} transform="translate(2, 1.5)" />
+        <path d={dropPath} fill={PAPER} transform="translate(2, 1.5)" />
         <path d={dropPath} fill="none" stroke={ink} strokeWidth={1.8} />
       </g>
     );

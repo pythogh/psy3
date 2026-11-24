@@ -21,7 +21,7 @@ const mascotMood = z
 
 export const shotTextSchema = z.object({
   text: z.string().describe("Texte affiché, révélé mot par mot. Le signe | force un retour à la ligne"),
-  style: z.enum(["giant", "hook", "title", "body", "note"]).optional().describe("Taille : géant, accroche, titre, corps, note"),
+  style: z.enum(["giant", "hook", "title", "body", "note", "term"]).optional().describe("Taille : géant, accroche, titre, corps, note, terme (étiquette)"),
   pos: z.enum(["top", "center", "bottom"]).optional().describe("Position verticale"),
   at: seconds().optional().describe("Début de la révélation (s)"),
   spread: seconds().optional().describe("Durée de la révélation de tous les mots (s)"),
@@ -223,6 +223,7 @@ export const styleSchema = z.object({
   grain: z.number().min(0).max(1).describe("Intensité du grain papier"),
   progressBar: z.boolean().describe("Barre de progression en haut"),
   series: z.string().describe("Titre de série (vide = masqué)"),
+  textTop: z.number().min(150).max(900).optional().describe("Hauteur du texte en position top (px, défaut 250)"),
   riso: z
     .object({
       wobble: z.number().min(0).max(20).describe("Tremblé des traits (px). 0 = traits nets"),
@@ -240,7 +241,7 @@ const recipeCommon = {
   duration: z.number().min(0.2).max(20).describe("Durée (s)"),
   bg: background.optional(),
   narration: z.string().optional().describe("Voix off sur ce plan (repère)"),
-  textStyle: z.enum(["giant", "hook", "title", "body"]).optional().describe("Taille du texte (auto si vide)"),
+  textStyle: z.enum(["giant", "hook", "title", "body", "term"]).optional().describe("Taille du texte (auto si vide). term = notion clé sur une étiquette"),
   textPos: z.enum(["top", "center", "bottom"]).optional().describe("Position du texte (auto si vide)"),
   enter: z.enum(["cut", "slam", "fade", "rise", "slide", "zoom", "wipe"]).optional().describe("Transition d'entrée (défaut : cut)"),
   camera: z.enum(["push", "pull", "still", "drift", "punch"]).optional().describe("Mouvement de caméra"),
