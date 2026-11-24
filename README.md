@@ -74,10 +74,10 @@ Le travail d'écriture se fait dans le Projet Claude, dont les consignes sont da
 - **Mascotte** : le litchi (recette `mascot`), deux ou trois plans par vidéo au maximum, et sur chaque vignette.
   Sur fond encre, il est posé sur un support crème, comme un autocollant.
 
-Le bloc `style` à reprendre dans chaque vidéo :
+Le bloc `style` à reprendre dans chaque vidéo, écrit en clair dans les `defaultProps` (pas de constante ni de raccourci : sinon `npm run synchro` et le Studio ne peuvent pas réécrire le fichier) :
 
 ```ts
-const style = {
+style: {
   palettes: {
     cream: { bg: "#F3ECE0", fg: "#1C1A19", accent: "#E0485A", muted: "#A8A094", shadow: "#E0485A", screen: "#2A2622" },
     ink: { bg: "#1C1A19", fg: "#F3ECE0", accent: "#E0485A", muted: "#5E5850", shadow: "#E0485A", screen: "#2A2622" },
@@ -89,7 +89,7 @@ const style = {
   progressBar: true,
   riso: { wobble: 4, boil: true, speckle: true },
   series: "Psycholitchi",
-};
+},
 ```
 
 Réglages utiles :
@@ -113,7 +113,7 @@ Toujours la même composition : la mascotte en grand au centre, sur fond encre, 
 On ne change que le titre et l'humeur du litchi (`mood`).
 
 ```tsx
-style: { ...style, progressBar: false, textTop: 340 },
+style: { /* même style que la vidéo, avec */ progressBar: false, textTop: 340 /* … */ },
 shots: [
   /* 0 */ { recipe: "mascot", bg: "ink", duration: 2, text: "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone\u00A0?", textStyle: "title", textPos: "top", mood: "perplexe", size: "large", position: "center" },
 ],

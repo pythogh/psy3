@@ -27,7 +27,7 @@ const run = (cmd, args) => {
 if (mode === "telecharger") {
   console.log("\nOuvre la notification « Open in Browser » (jamais « Make Public »),");
   console.log("clique sur les fichiers à télécharger, puis Ctrl+C ici pour arrêter.\n");
-  run("npx", ["--yes", "http-server", "out", "-p", "8000"]);
+  run("npx", ["--yes", "http-server", "out", "-p", "8000", "-c-1"]);
   process.exit(0);
 }
 

@@ -45,7 +45,7 @@ Réponses courtes. Ne relis pas et ne réécris pas le code du moteur. Si une id
 
 # Vignette (plan /* 0 */) : modèle fixe validé
 - Toujours la même composition : la mascotte en grand au centre, sur fond ink, avec le titre en haut. Seuls changent le titre et l’humeur du litchi (mood), choisie selon le sujet.
-- Un seul plan, duration: 2, dans la composition <id>-vignette, avec le style { ...style, progressBar: false, textTop: 340 } : elle sert de couverture TikTok et n’apparaît pas dans la vidéo. Reprendre tel quel le bloc du modèle de fichier.
+- Un seul plan, duration: 2, dans la composition <id>-vignette, avec le même style que la vidéo, mais progressBar: false et textTop: 340 : elle sert de couverture TikTok et n’apparaît pas dans la vidéo. Reprendre tel quel le bloc du modèle de fichier.
 - Le titre nomme clairement le sujet (le comportement ou l’objet concerné) ET pique la curiosité : une question en « tu » que le spectateur se pose déjà, ou une promesse de réponse. Jamais de formule abstraite qu’on ne comprend pas sans avoir vu la vidéo. Exemple validé : « Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone ? ».
 
 # Format d’un plan
@@ -80,27 +80,13 @@ Risographie et ligne organique : crème, encre et vert sauge, avec le rouge litc
 Alterner les fonds ; pas trois fois la même recette d’affilée ; slam pour les coupes nettes, wipe/slide/rise pour changer de partie, fade pour la conclusion ; giant : 1 à 3 mots par ligne, 4 lignes maximum ; 25 à 36 plans pour une minute.
 
 # Modèle de fichier (remplacer <id>, <Nom>, <titre>, le script, les plans et la vignette ; ne pas changer le reste sauf demande de nouvelle DA)
+Les defaultProps s’écrivent toujours en clair : pas de constante, pas de raccourci (title, style…), pas de « ... », sinon `npm run synchro` et le Studio ne peuvent pas réécrire le fichier.
+
 import React from "react";
 import { Composition } from "remotion";
 import { videoSchema } from "../schema";
 import { Video } from "../../engine/Video";
 import { calculateVideoMetadata, DEFAULT_FPS } from "../../engine/timing";
-
-const title = "<titre>";
-
-const style = {
-  palettes: {
-    cream: { bg: "#F3ECE0", fg: "#1C1A19", accent: "#E0485A", muted: "#A8A094", shadow: "#E0485A", screen: "#2A2622" },
-    ink: { bg: "#1C1A19", fg: "#F3ECE0", accent: "#E0485A", muted: "#5E5850", shadow: "#E0485A", screen: "#2A2622" },
-    accent: { bg: "#8FAE97", fg: "#1C1A19", accent: "#E0485A", muted: "#6F9179", shadow: "#E0485A", screen: "#2A2622" },
-  },
-  textSizes: { giant: 230, hook: 118, title: 88, body: 60, note: 34 },
-  shadow: { dx: 8, dy: 7 },
-  grain: 0.2,
-  progressBar: true,
-  riso: { wobble: 4, boil: true, speckle: true },
-  series: "Psycholitchi",
-};
 
 export const <Nom>Composition: React.FC = () => (
   <Composition
@@ -113,14 +99,27 @@ export const <Nom>Composition: React.FC = () => (
     durationInFrames={1}
     calculateMetadata={calculateVideoMetadata}
     defaultProps={{
-      title,
-      style,
+      title: "<titre>",
+      style: {
+        palettes: {
+          cream: { bg: "#F3ECE0", fg: "#1C1A19", accent: "#E0485A", muted: "#A8A094", shadow: "#E0485A", screen: "#2A2622" },
+          ink: { bg: "#1C1A19", fg: "#F3ECE0", accent: "#E0485A", muted: "#5E5850", shadow: "#E0485A", screen: "#2A2622" },
+          accent: { bg: "#8FAE97", fg: "#1C1A19", accent: "#E0485A", muted: "#6F9179", shadow: "#E0485A", screen: "#2A2622" },
+        },
+        textSizes: { giant: 230, hook: 118, title: 88, body: 60, note: 34 },
+        shadow: { dx: 8, dy: 7 },
+        grain: 0.2,
+        progressBar: true,
+        riso: { wobble: 4, boil: true, speckle: true },
+        series: "Psycholitchi",
+      },
       script: [
         // un paragraphe par ligne : le texte DIT par la voix
       ],
       shots: [
         // une ligne par plan, préfixée par /* n */
       ],
+      audio: { src: "voix/<id>.wav" },
     }}
   />
 );
@@ -136,8 +135,21 @@ export const <Nom>Vignette: React.FC = () => (
     durationInFrames={1}
     calculateMetadata={calculateVideoMetadata}
     defaultProps={{
-      title,
-      style: { ...style, progressBar: false, textTop: 340 },
+      title: "<titre>",
+      style: {
+        palettes: {
+          cream: { bg: "#F3ECE0", fg: "#1C1A19", accent: "#E0485A", muted: "#A8A094", shadow: "#E0485A", screen: "#2A2622" },
+          ink: { bg: "#1C1A19", fg: "#F3ECE0", accent: "#E0485A", muted: "#5E5850", shadow: "#E0485A", screen: "#2A2622" },
+          accent: { bg: "#8FAE97", fg: "#1C1A19", accent: "#E0485A", muted: "#6F9179", shadow: "#E0485A", screen: "#2A2622" },
+        },
+        textSizes: { giant: 230, hook: 118, title: 88, body: 60, note: 34 },
+        shadow: { dx: 8, dy: 7 },
+        grain: 0.2,
+        progressBar: false,
+        riso: { wobble: 4, boil: true, speckle: true },
+        series: "Psycholitchi",
+        textTop: 340,
+      },
       shots: [
         /* 0 */ { recipe: "mascot", bg: "ink", duration: 2, text: "<titre de la vignette>\u00A0?", textStyle: "title", textPos: "top", mood: "<humeur>", size: "large", position: "center" },
       ],
