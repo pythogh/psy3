@@ -1,5 +1,5 @@
 import React from "react";
-import { TelephoneComposition } from "./videos/telephone";
+import { TelephoneComposition, TelephoneVignette } from "./videos/telephone";
 
 /**
  * Liste des vidéos du projet. Chaque vidéo est un fichier dans src/data/videos/
@@ -9,5 +9,6 @@ import { TelephoneComposition } from "./videos/telephone";
 export const Videos: React.FC = () => (
   <>
     <TelephoneComposition />
+    <TelephoneVignette />
   </>
 );
