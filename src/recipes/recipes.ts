@@ -25,6 +25,9 @@ const DECOR_SPOTS = [
   { x: 1000, y: 1200, size: 640 },
 ];
 
+/** Échelle de la mascotte (diamètre du corps ≈ 128 × scale px). */
+const MASCOT_SCALE = { small: 1.1, medium: 2.1, large: 3.2 } as const;
+
 const decorLayer = (decor: RecipeShot["decor"], bg: Shot["bg"], index: number): Layer[] => {
   if (!decor || decor === "none") return [];
   if (decor === "ring" || decor === "dashedRing") {
@@ -62,7 +65,9 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
   const bg = s.bg ?? "cream";
   const seed = `p${index}`;
   const isWords = s.recipe === "words";
-  const textPos = s.textPos ?? (isWords ? "center" : "bottom");
+  // Mascotte en bas : le texte monte en haut par défaut
+  const mascotLow = s.recipe === "mascot" && s.position === "bottom";
+  const textPos = s.textPos ?? (isWords ? "center" : mascotLow ? "top" : "bottom");
   // Zone libre pour le visuel selon la position du texte
   const vy = textPos === "top" ? 1150 : 640;
   const textStyle = s.textStyle ?? (isWords ? "giant" : wordCount(s.text) > 7 ? "title" : "hook");
@@ -165,6 +170,20 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
         },
       ];
       if (part === "end" && !s.camera) camera = { zoom: [1.5, 1.25], x: [380, -120] };
+      break;
+    }
+    case "mascot": {
+      const position = s.position ?? "center";
+      const size = s.size ?? (position === "corner" ? "small" : "medium");
+      let x = 540;
+      let y = vy + 40;
+      if (position === "bottom") y = 1480;
+      if (position === "corner") {
+        x = 860;
+        y = textPos === "bottom" ? 400 : 1560;
+      }
+      layers = [{ type: "mascot", x, y, scale: MASCOT_SCALE[size], mood: s.mood ?? "content", onDark: bg === "ink", enterAt: 0.1 }];
+      if (!s.camera) camera = CAMERAS.still(d);
       break;
     }
     case "custom":
