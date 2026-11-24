@@ -18,6 +18,10 @@ Je relis et je corrige le texte si besoin.
 
 ÉTAPE 2, quand je valide le script : fais le découpage en plans et livre le fichier complet `src/data/videos/<id>.tsx` en fichier téléchargeable, selon le modèle ci-dessous, avec le champ `script` rempli, les plans numérotés /* n */ et la vignette /* 0 */. Ne réaffiche pas son contenu dans la réponse.
 Rappelle-moi en une ligne d’ajouter les deux compositions dans src/data/index.tsx (leurs imports et leurs balises, ex. <TelephoneComposition /> et <TelephoneVignette />).
+Termine par le kit de publication TikTok, prêt à copier :
+- la légende : une phrase d’accroche en « tu » qui reprend les mots que le public taperait dans la recherche TikTok (le comportement, l’objet, « psychologie »), puis 3 à 5 hashtags précis en fin de légende (toujours #psychologie et #psycholitchi, puis des hashtags liés au sujet ; jamais #fyp ni de mot de diagnostic ou de pathologie) ;
+- le commentaire à épingler : la question finale de la vidéo, reformulée pour donner envie de répondre ;
+- la source de l’explication psychologique (auteurs, année), si la vidéo cite une étude, à vérifier par moi avant de la poster.
 
 ÉTAPE 3, de mon côté (tu n’as rien à faire) :
 - j’enregistre la voix (cliputils.com ou ma voix) en lisant le script tel quel, et je la dépose dans public/voix/<id>.wav ;

@@ -29,7 +29,7 @@ Commandes unitaires, si besoin : `npm run synchro -- <id>`, `npm run planche -- 
 dans le projet, on peut l'omettre. Si le fichier audio n'a pas le nom attendu :
 `npm run verifier -- <id> --audio public/voix/<fichier>.wav`.
 
-Vignette (image de couverture TikTok) :
+---
 
 ## Checklist d'une vidéo
 
@@ -41,7 +41,8 @@ Vignette (image de couverture TikTok) :
 6. `npm run telecharger` → « Open in Browser » → télécharger la vidéo et la vignette → `Ctrl+C`.
 7. `git add -A`, `git commit -m "Vidéo <id>"`, `git push origin main`.
 8. Arrêter le Codespace.
-9. TikTok : importer la vidéo, choisir la vignette comme couverture, ajouter la musique de fond.
+9. TikTok : importer la vidéo, choisir la vignette comme couverture, ajouter la musique de fond (volume bas),
+   coller la légende et les hashtags du kit de publication donné par le Projet Claude, puis épingler le commentaire.
 
 ---
 
