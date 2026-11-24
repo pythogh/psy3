@@ -29,7 +29,7 @@ Commandes unitaires, si besoin : `npm run synchro -- <id>`, `npm run planche -- 
 dans le projet, on peut l'omettre. Si le fichier audio n'a pas le nom attendu :
 `npm run verifier -- <id> --audio public/voix/<fichier>.wav`.
 
----
+Vignette (image de couverture TikTok) :
 
 ## Checklist d'une vidéo
 
