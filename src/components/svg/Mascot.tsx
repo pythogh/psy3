@@ -1,24 +1,15 @@
 import React from "react";
-import { spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { spring, useVideoConfig } from "remotion";
+import type { MascotLayer } from "../../data/types";
 
 /*
  * MASCOTTE : le litchi kawaii de « Psychologie du quotidien ».
  * Dessin centré sur (0,0), rayon 64. Seuls les yeux, la bouche et les accessoires changent selon l'humeur.
+ * Reçoit { layer, t, d } comme les autres calques (t = temps écoulé dans le plan, en s).
  * Animation : entrée en rebond (avec léger squash), puis balancement continu pivotant à la base, clignement des yeux.
  */
 
-export type MascotMood = "content" | "perplexe" | "surpris" | "reveur" | "gene";
-
-export type MascotProps = {
-  x: number;
-  y: number;
-  scale: number;
-  mood?: MascotMood;
-  /** Fond sombre (ink) : la tige et la feuille passent en crème pour rester visibles. */
-  onDark?: boolean;
-  /** Décalage d'entrée en secondes depuis le début du plan. */
-  enterAt?: number;
-};
+type MascotMood = MascotLayer["mood"];
 
 const INK = "#141210";
 const BODY = "#D0561A";
@@ -158,12 +149,12 @@ const Accessory: React.FC<{ mood: MascotMood; pop: number; t: number }> = ({ moo
   return null;
 };
 
-export const Mascot: React.FC<MascotProps> = ({ x, y, scale, mood = "content", onDark = false, enterAt = 0 }) => {
-  const frame = useCurrentFrame();
+export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({ layer, t: shotT }) => {
+  const { x, y, scale, mood = "content", onDark = false, enterAt = 0 } = layer;
   const { fps } = useVideoConfig();
-  const local = frame - enterAt * fps;
-  if (local < 0) return null;
-  const t = local / fps;
+  const t = shotT - enterAt;
+  if (t < 0) return null;
+  const local = t * fps;
 
   // Entrée en rebond + squash/stretch
   const enter = spring({ frame: local, fps, config: { damping: 9, stiffness: 170, mass: 0.7 } });
@@ -184,12 +175,21 @@ export const Mascot: React.FC<MascotProps> = ({ x, y, scale, mood = "content", o
   const pop = spring({ frame: local - 0.35 * fps, fps, config: { damping: 10, stiffness: 180 } });
   const leaf = onDark ? CREAM : INK;
 
+  const w = VB.w * scale;
+  const h = VB.h * scale;
+  const left = x + VB.x * scale;
+  const top = y + VB.y * scale;
+
+  // x/y/width/height : placement dans un SVG parent ; style : placement dans un conteneur HTML
   return (
     <svg
       viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}
-      width={VB.w * scale}
-      height={VB.h * scale}
-      style={{ position: "absolute", left: x + VB.x * scale, top: y + VB.y * scale, overflow: "visible" }}
+      x={left}
+      y={top}
+      width={w}
+      height={h}
+      overflow="visible"
+      style={{ position: "absolute", left, top, overflow: "visible" }}
     >
       {/* Ombre au sol */}
       <ellipse cx={0} cy={84} rx={46 * (1 - bob / 40)} ry={7} fill={onDark ? "#000000" : INK} opacity={0.12 * Math.min(enter, 1)} />
