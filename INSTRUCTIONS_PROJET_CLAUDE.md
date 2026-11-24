@@ -50,6 +50,7 @@ Réponses courtes. Ne relis pas et ne réécris pas le code du moteur. Si une id
 - Le titre nomme clairement le sujet (le comportement ou l’objet concerné) ET pique la curiosité : une question en « tu » que le spectateur se pose déjà, ou une promesse de réponse. Jamais de formule abstraite qu’on ne comprend pas sans avoir vu la vidéo. Exemple validé : « Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone ? ».
 - Titre en textStyle "hook" s’il est court, "title" s’il est long, en haut, lisible en petit sur un téléphone.
 - Deux ou trois éléments qui annoncent la DA et le sujet : la recette la plus emblématique de la vidéo, un fond fort (accent ou ink), un decor qui n’est pas derrière le texte.
+- La mascotte peut porter la vignette : recipe "mascot", size "large", position "bottom" (le titre passe en haut), humeur qui colle au sujet, fond ink.
 - Si la vignette demande plusieurs objets combinés qu’aucune recette ne sait faire, signale « nouvelle recette possible : cover ».
 
 # Format d’un plan
@@ -68,13 +69,15 @@ Catalogue des recettes :
 - dot : un point. mode: fill | empty | fillToEmpty.
 - ground : un téléphone qui surgit d’une ligne, mécaniquement. pace: slow | fast.
 - context : un décor surgit puis le téléphone (toujours affiché à droite). kind: elevator | queue.
+- mascot : la mascotte de la chaîne, un litchi kawaii qui entre en rebond puis se balance. mood: content | perplexe (penché, petit « ? ») | surpris | reveur (yeux fermés, bulle) | gene (regard de côté, goutte) ; size: small | medium | large ; position: center | bottom (le texte passe en haut) | corner (petite, dans un coin, pour accompagner un texte). Deux ou trois plans par vidéo au maximum, plutôt aux moments où le spectateur se reconnaît. Ex. : /* 4 */ { recipe: "mascot", bg: "cream", duration: 1.6, text: "Et pourtant… | tu recommences.", mood: "perplexe" },
 
 À éviter (rendu jugé raté) :
 - reach (la main) ;
 - context kind: "hourglass" (le sablier) ;
 - timeline (barres mal posées sur l’axe) ;
 - pattern avec close: true (la grille déborde en haut à gauche) ;
-- un decor (circle, ring, dashedRing) derrière un texte de la même couleur : mettre decor: "none" sur words.
+- un decor (circle, ring, dashedRing) derrière un texte de la même couleur : mettre decor: "none" sur words ;
+- mascot sur bg: "accent" (la mascotte orange se confond avec le fond) : la mettre sur cream ou ink.
 
 # Règles de montage
 Alterner les fonds ; pas trois fois la même recette d’affilée ; slam pour les coupes nettes, wipe/slide/rise pour changer de partie, fade pour la conclusion ; giant : 1 à 3 mots par ligne, 4 lignes maximum ; 25 à 36 plans pour une minute.
