@@ -11,7 +11,7 @@ const seconds = (max = 10) => z.number().min(0).max(max);
 const px = z.number().min(-2000).max(3000);
 const range = (min: number, max: number, _step?: number) => z.tuple([z.number().min(min).max(max), z.number().min(min).max(max)]);
 
-const background = z.enum(["cream", "ink", "accent"]).describe("Fond du plan : crème, noir ou orange");
+const background = z.enum(["cream", "ink", "accent"]).describe("Fond du plan : crème, encre ou couleur d’accent");
 const paletteColor = z.enum(["fg", "accent", "muted", "bg", "shadow", "screen"]);
 const mascotMood = z
   .enum(["content", "perplexe", "surpris", "reveur", "gene"])
@@ -223,6 +223,14 @@ export const styleSchema = z.object({
   grain: z.number().min(0).max(1).describe("Intensité du grain papier"),
   progressBar: z.boolean().describe("Barre de progression en haut"),
   series: z.string().describe("Titre de série (vide = masqué)"),
+  riso: z
+    .object({
+      wobble: z.number().min(0).max(20).describe("Tremblé des traits (px). 0 = traits nets"),
+      boil: z.boolean().describe("Le tremblé frémit légèrement d'une image à l'autre"),
+      speckle: z.boolean().describe("Pointillé d'encre dans la couche de couleur décalée"),
+    })
+    .optional()
+    .describe("Effet risographie : trait organique et couche décalée texturée"),
 });
 
 /* ── Recettes de plans (format court) ───────────────────────────── */

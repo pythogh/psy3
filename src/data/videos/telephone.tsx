@@ -16,14 +16,15 @@ const title = "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphon
 
 const style = {
   palettes: {
-    cream: { bg: "#EDE5D3", fg: "#141210", accent: "#B5470F", muted: "#A39A8A", shadow: "#CFC3AB", screen: "#2A2622" },
-    ink: { bg: "#141210", fg: "#EDE5D3", accent: "#D0561A", muted: "#5E5850", shadow: "#3A342E", screen: "#2A2622" },
-    accent: { bg: "#B5470F", fg: "#141210", accent: "#EDE5D3", muted: "#8C360B", shadow: "#8C360B", screen: "#2A2622" },
+    cream: { bg: "#F3ECE0", fg: "#1C1A19", accent: "#E0485A", muted: "#A8A094", shadow: "#E0485A", screen: "#2A2622" },
+    ink: { bg: "#1C1A19", fg: "#F3ECE0", accent: "#E0485A", muted: "#5E5850", shadow: "#E0485A", screen: "#2A2622" },
+    accent: { bg: "#8FAE97", fg: "#1C1A19", accent: "#E0485A", muted: "#6F9179", shadow: "#E0485A", screen: "#2A2622" },
   },
   textSizes: { giant: 230, hook: 118, title: 88, body: 60, note: 34 },
-  shadow: { dx: 16, dy: 16 },
-  grain: 0.16,
+  shadow: { dx: 8, dy: 7 },
+  grain: 0.5,
   progressBar: true,
+  riso: { wobble: 4, boil: true, speckle: true },
   series: "Psychologie du quotidien",
 };
 
@@ -104,7 +105,7 @@ export const TelephoneVignette: React.FC = () => (
       title,
       style: { ...style, progressBar: false },
       shots: [
-        /* 0 */ { recipe: "mascot", bg: "ink", duration: 1, text: "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone\u00A0?", textStyle: "title", mood: "perplexe", size: "large", position: "bottom" },
+        /* 0 */ { recipe: "mascot", bg: "ink", duration: 2, text: "Pourquoi tu ne peux pas t’empêcher de vérifier ton téléphone\u00A0?", textStyle: "title", mood: "perplexe", size: "large", position: "bottom" },
       ],
     }}
   />

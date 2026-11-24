@@ -9,7 +9,7 @@ export type Palette = {
   fg: string; // texte et objets principaux
   accent: string; // accent (écran allumé, récompenses)
   muted: string; // éléments secondaires
-  shadow: string; // ombre portée dure
+  shadow: string; // ombre portée dure (en risographie : la couche de couleur décalée)
   screen: string; // écran éteint
 };
 
@@ -40,6 +40,8 @@ export const baseTheme = {
   },
   shadow: { dx: 16, dy: 16 }, // ombre portée dure (sans flou)
   grain: { opacity: 0.16 }, // texture papier (public/grain.png), 0 pour la désactiver
+  // Risographie : désactivée par défaut, les anciennes vidéos ne changent pas
+  riso: { wobble: 0, boil: false, speckle: false },
   motion: {
     enter: [0.16, 1, 0.3, 1] as [number, number, number, number],
     exit: [0.7, 0, 0.84, 0] as [number, number, number, number],
@@ -61,6 +63,7 @@ export const styleToTheme = (style: {
   textSizes: Record<TextStyleName, number>;
   shadow: { dx: number; dy: number };
   grain: number;
+  riso?: { wobble: number; boil: boolean; speckle: boolean };
 }): Theme => {
   const t: Theme = JSON.parse(JSON.stringify(baseTheme));
   t.palettes = style.palettes;
@@ -69,6 +72,7 @@ export const styleToTheme = (style: {
   });
   t.shadow = style.shadow;
   t.grain = { opacity: style.grain };
+  if (style.riso) t.riso = style.riso;
   return t;
 };
 

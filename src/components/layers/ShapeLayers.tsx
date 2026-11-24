@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { random } from "remotion";
 import type { CounterLayer, DotLayer, GroundLayer, PatternLayer, ShapeLayer, TimelineLayer } from "../../data/types";
 import { usePalette, useTheme } from "../../theme/ThemeContext";
+import { useRiso } from "../riso";
 import { ContextShape, CONTEXT_HEIGHT } from "../svg/Contexts";
 import { Phone, PHONE_H } from "../svg/Phone";
 import { envelope, mix, ramp, springy } from "./anim";
@@ -11,6 +12,7 @@ type P<L> = { layer: L; t: number; d: number };
 /** Grille de cases : remplissage régulier (apprentissage) ou flashs imprévisibles (intermittence). */
 export const Pattern: React.FC<P<PatternLayer>> = ({ layer, t }) => {
   const pal = usePalette();
+  const riso = useRiso();
   const n = layer.columns * layer.rows;
   const totalW = layer.columns * layer.size + (layer.columns - 1) * layer.gap;
   const totalH = layer.rows * layer.size + (layer.rows - 1) * layer.gap;
@@ -34,6 +36,28 @@ export const Pattern: React.FC<P<PatternLayer>> = ({ layer, t }) => {
           const cycle = Math.floor((t + phase) / period);
           reward = random(`${layer.seed}-r-${i}-${cycle}`) < (layer.rewardRate ?? 0);
         }
+        if (riso.on) {
+          // Case dessinée à la main : légère rotation, couleur décalée sous le trait
+          const s = layer.size;
+          const rot = (random(`${layer.seed}-rot-${i}`) - 0.5) * 4;
+          const color = reward ? pal.accent : layer.mode === "sequence" ? pal.shadow : pal.muted;
+          return (
+            <g key={i} transform={`rotate(${rot}, ${cx + s / 2}, ${cy + s / 2})`}>
+              {fill > 0.01 ? (
+                <rect
+                  x={cx + riso.dx + (s * (1 - fill)) / 2}
+                  y={cy + riso.dy + (s * (1 - fill)) / 2}
+                  width={s * fill}
+                  height={s * fill}
+                  rx={s * 0.08}
+                  fill={color}
+                  opacity={0.92}
+                />
+              ) : null}
+              <rect x={cx} y={cy} width={s} height={s} rx={s * 0.08} fill="none" stroke={pal.fg} strokeWidth={6} />
+            </g>
+          );
+        }
         const color = reward ? pal.accent : pal.fg;
         return (
           <g key={i}>
@@ -56,10 +80,48 @@ export const Pattern: React.FC<P<PatternLayer>> = ({ layer, t }) => {
 export const Counter: React.FC<P<CounterLayer>> = ({ layer, t }) => {
   const pal = usePalette();
   const theme = useTheme();
+  const riso = useRiso();
   const k = ramp(t, 0.05, layer.duration, "inOut");
   const value = Math.round(mix(layer.from, layer.to, k));
   const r = layer.radius;
   const c = 2 * Math.PI * r;
+  const label = (
+    <>
+      {value}
+      {layer.suffix ?? ""}
+    </>
+  );
+  const textProps = {
+    textAnchor: "middle" as const,
+    dominantBaseline: "central" as const,
+    fontFamily: theme.font.family,
+    fontWeight: 800,
+    fontSize: r * 0.78,
+    letterSpacing: "-0.04em",
+  };
+  if (riso.on) {
+    // Anneau de couleur décalé qui se remplit, trait d'encre fin, chiffres doublés en couleur
+    return (
+      <g transform={`translate(${layer.x}, ${layer.y})`}>
+        <circle
+          r={r}
+          fill="none"
+          stroke={pal.shadow}
+          strokeWidth={34}
+          opacity={0.92}
+          strokeDasharray={`${c * k} ${c}`}
+          transform={`translate(${riso.dx * 1.4}, ${riso.dy * 1.4}) rotate(-90)`}
+        />
+        <circle r={r} fill="none" stroke={pal.fg} strokeWidth={7} />
+        <text {...textProps} x={riso.dx * 1.2} y={riso.dy * 1.2} fill={pal.shadow} opacity={0.92}>
+          {label}
+        </text>
+        <text {...textProps} fill={pal.fg}>
+          {label}
+        </text>
+      </g>
+    );
+  }
   return (
     <g transform={`translate(${layer.x}, ${layer.y})`}>
       <circle r={r} fill="none" stroke={pal.muted} strokeWidth={14} />
@@ -71,17 +133,8 @@ export const Counter: React.FC<P<CounterLayer>> = ({ layer, t }) => {
         strokeDasharray={`${c * k} ${c}`}
         transform="rotate(-90)"
       />
-      <text
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontFamily={theme.font.family}
-        fontWeight={800}
-        fontSize={r * 0.78}
-        letterSpacing="-0.04em"
-        fill={pal.fg}
-      >
-        {value}
-        {layer.suffix ?? ""}
+      <text {...textProps} fill={pal.fg}>
+        {label}
       </text>
     </g>
   );
@@ -90,6 +143,7 @@ export const Counter: React.FC<P<CounterLayer>> = ({ layer, t }) => {
 /** Point plein, contour pointillé, ou point qui se vide ; pulsation et onde d'écho. */
 export const Dot: React.FC<P<DotLayer>> = ({ layer, t }) => {
   const pal = usePalette();
+  const riso = useRiso();
   const empty =
     layer.mode === "empty" ? 1 : layer.mode === "fill" ? 0 : ramp(t, layer.emptyAt ?? 0.6, 0.6, "inOut");
   const appear = Math.max(0, springy(t, 0, 0.6));
@@ -98,6 +152,30 @@ export const Dot: React.FC<P<DotLayer>> = ({ layer, t }) => {
   const breathe = 1 + 0.05 * Math.sin(phase * Math.PI * 2);
   const r = layer.radius;
   const dash = (2 * Math.PI * r) / 36;
+  if (riso.on) {
+    // Disque de couleur décalé sous un trait d'encre ; vide = contour pointillé seul
+    return (
+      <g transform={`translate(${layer.x}, ${layer.y})`}>
+        {layer.echo ? (
+          <circle r={r * (1 + phase * 0.8)} fill="none" stroke={pal.fg} strokeWidth={4} opacity={(1 - phase) * 0.5} />
+        ) : null}
+        <g transform={`scale(${appear * breathe})`}>
+          <circle cx={riso.dx * 2} cy={riso.dy * 2} r={r} fill={pal.shadow} opacity={(1 - empty) * 0.92} />
+          <circle r={r} fill="none" stroke={pal.fg} strokeWidth={8} opacity={1 - empty} />
+          <circle
+            r={r}
+            fill="none"
+            stroke={pal.fg}
+            strokeWidth={8}
+            strokeDasharray={`${dash * 0.55} ${dash * 0.45}`}
+            strokeLinecap="round"
+            opacity={empty}
+            transform={`rotate(${t * 20})`}
+          />
+        </g>
+      </g>
+    );
+  }
   return (
     <g transform={`translate(${layer.x}, ${layer.y})`}>
       {layer.echo ? (
