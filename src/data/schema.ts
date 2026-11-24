@@ -13,6 +13,9 @@ const range = (min: number, max: number, _step?: number) => z.tuple([z.number().
 
 const background = z.enum(["cream", "ink", "accent"]).describe("Fond du plan : crème, noir ou orange");
 const paletteColor = z.enum(["fg", "accent", "muted", "bg", "shadow", "screen"]);
+const mascotMood = z
+  .enum(["content", "perplexe", "surpris", "reveur", "gene"])
+  .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée");
 
 /* ── Texte ───────────────────────────────────────────────────────── */
 
@@ -151,6 +154,16 @@ const reachLayer = z.object({
   at: seconds().describe("Instant où le bras atteint le téléphone (s)"),
 });
 
+const mascotLayer = z.object({
+  type: z.literal("mascot"),
+  x: px.describe("Centre du corps (px)"),
+  y: px.describe("Centre du corps (px)"),
+  scale: z.number().min(0.1).max(6).describe("Échelle (diamètre du corps ≈ 128 × échelle)"),
+  mood: mascotMood,
+  onDark: z.boolean().optional().describe("Tige et feuille claires pour un fond sombre"),
+  enterAt: seconds().optional().describe("Instant d'entrée en rebond (s)"),
+});
+
 export const layerSchema = z.discriminatedUnion("type", [
   phoneLayer,
   phoneRowLayer,
@@ -162,6 +175,7 @@ export const layerSchema = z.discriminatedUnion("type", [
   groundLayer,
   timelineLayer,
   reachLayer,
+  mascotLayer,
 ]);
 
 /* ── Plan ────────────────────────────────────────────────────────── */
@@ -263,6 +277,13 @@ export const recipeShotSchema = z.discriminatedUnion("recipe", [
   z.object({ recipe: z.literal("context"), ...recipeCommon, kind: z.enum(["elevator", "queue", "hourglass"]) }),
   z.object({ recipe: z.literal("reach"), ...recipeCommon }),
   z.object({ recipe: z.literal("timeline"), ...recipeCommon, part: z.enum(["start", "end", "all"]).optional() }),
+  z.object({
+    recipe: z.literal("mascot"),
+    ...recipeCommon,
+    mood: mascotMood.optional(),
+    size: z.enum(["small", "medium", "large"]).optional().describe("Taille de la mascotte"),
+    position: z.enum(["center", "bottom", "corner"]).optional().describe("Place : centre, en bas (texte en haut), dans un coin"),
+  }),
   z.object({
     recipe: z.literal("custom"),
     ...recipeCommon,
