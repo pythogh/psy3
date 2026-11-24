@@ -25,4 +25,6 @@ export type ShapeLayer = LayerOf<"shape">;
 export type GroundLayer = LayerOf<"ground">;
 export type TimelineLayer = LayerOf<"timeline">;
 export type ReachLayer = LayerOf<"reach">;
+export type MascotLayer = LayerOf<"mascot">;
+export type MascotMood = MascotLayer["mood"];
 export type ContextKind = NonNullable<GroundLayer["context"]>["kind"];
