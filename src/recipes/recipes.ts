@@ -178,7 +178,8 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
       const size = s.size ?? (position === "corner" ? "small" : "medium");
       let x = 540;
       let y = vy + 40;
-      if (position === "bottom") y = 1480;
+      // En bas, mais au-dessus de la zone masquée par la légende et les boutons TikTok
+      if (position === "bottom") y = 1330;
       if (position === "corner") {
         x = 860;
         y = textPos === "bottom" ? 400 : 1560;
