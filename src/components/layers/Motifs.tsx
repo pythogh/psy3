@@ -147,24 +147,54 @@ const Orbit: React.FC<P> = ({ t }) => {
   );
 };
 
-/** Forme qui se fend en deux : une moitié garde la couche rouge (la sensation reste). */
+/** Forme qui se fend : une moitié hachurée (la scène), l'autre rouge qui bat (la sensation), des éclats qui s'échappent. */
 const Split: React.FC<P> = ({ t }) => {
   const pal = usePalette();
   const { dx, dy } = useRiso();
-  const crack = ramp(t, 0.15, 0.35);
-  const sep = 75 * ramp(t, 0.5, 0.8, "inOut");
-  const left = "M 0,-180 A 180 180 0 0 0 0,180 L 18,120 L -12,60 L 16,0 L -14,-60 L 14,-120 Z";
-  const right = "M 0,-180 A 180 180 0 0 1 0,180 L 18,120 L -12,60 L 16,0 L -14,-60 L 14,-120 Z";
+  const crack = ramp(t, 0.1, 0.35);
+  const open = ramp(t, 0.4, 0.7, "inOut");
+  const sep = 70 * open;
+  const beat = 1 + 0.045 * Math.max(0, Math.sin(t * 7)) * open;
+  const zig = "L 22,130 L -10,85 L 26,40 L -6,0 L 20,-45 L -14,-90 L 12,-135 Z";
+  const left = `M 0,-185 A 185 185 0 0 0 0,185 ${zig}`;
+  const right = `M 0,-185 A 185 185 0 0 1 0,185 ${zig}`;
+  const shards = [
+    { x: 0, y: -120, a: -1.9, r: 0 },
+    { x: 5, y: 20, a: 0.4, r: 1 },
+    { x: -5, y: 110, a: 2.4, r: 2 },
+  ];
   return (
     <g>
-      <g transform={`translate(${-sep}, ${sep * 0.15}) rotate(${-6 * (sep / 75)})`}>
+      <defs>
+        <clipPath id="split-left-clip">
+          <path d={left} />
+        </clipPath>
+      </defs>
+      {/* Moitié gauche : la scène, en hachures d'encre */}
+      <g transform={`translate(${-sep}, ${sep * 0.12}) rotate(${-7 * open})`}>
+        <g clipPath="url(#split-left-clip)" opacity={0.55}>
+          {Array.from({ length: 16 }, (_, i) => (
+            <path key={i} d={`M ${-260 + i * 26},200 L ${-60 + i * 26},-200`} {...ink(pal.fg, 4)} />
+          ))}
+        </g>
         <path d={left} {...ink(pal.fg, 8)} />
       </g>
-      <g transform={`translate(${sep}, ${-sep * 0.15}) rotate(${6 * (sep / 75)})`}>
-        <path d={right} transform={`translate(${dx * 1.4}, ${dy * 1.4})`} fill={pal.shadow} opacity={0.92} />
+      {/* Moitié droite : la sensation, rouge, qui bat */}
+      <g transform={`translate(${sep}, ${-sep * 0.12}) rotate(${7 * open}) scale(${beat})`}>
+        <path d={right} transform={`translate(${dx * 1.5}, ${dy * 1.5})`} fill={pal.shadow} opacity={0.92} />
         <path d={right} {...ink(pal.fg, 8)} />
+        <path d="M 70,-60 C 95,-30 95,30 70,60 M 115,-85 C 150,-40 150,40 115,85" {...ink(pal.fg, 5)} opacity={open * (0.5 + 0.5 * Math.sin(t * 7))} />
       </g>
-      <path d="M 14,-120 L -14,-60 L 16,0 L -12,60 L 18,120" {...ink(pal.fg, 6)} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - crack} opacity={1 - sep / 75} />
+      {/* Fissure qui se dessine, puis éclats qui s'échappent */}
+      <path d="M 0,-185 L 12,-135 L -14,-90 L 20,-45 L -6,0 L 26,40 L -10,85 L 22,130 L 0,185" {...ink(pal.fg, 6)} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - crack} opacity={1 - open} />
+      {shards.map((c, i) => {
+        const p = ramp(t, 0.45 + i * 0.08, 0.9);
+        const x = c.x + Math.cos(c.a) * 40 * p;
+        const y = c.y + Math.sin(c.a) * 40 * p - 60 * p;
+        return (
+          <path key={i} d="M -10,-8 L 12,-4 L -2,12 Z" transform={`translate(${x}, ${y}) rotate(${120 * p + c.r * 40})`} {...(i === 1 ? { fill: pal.shadow } : ink(pal.fg, 4))} opacity={p * (1 - ramp(t, 1.3, 0.4))} />
+        );
+      })}
     </g>
   );
 };

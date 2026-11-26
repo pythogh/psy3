@@ -22,48 +22,57 @@ const ink = (color: string, w: number) => ({
   strokeLinejoin: "round" as const,
 });
 
-/** Nuit : un lit sous la lune, la couverture respire, les yeux restent ouverts. */
+/** Nuit : un lit vu de dessus sous la lune, la couverture respire, les yeux restent ouverts. */
 const Night: React.FC<P> = ({ t }) => {
   const pal = usePalette();
   const { dx, dy } = useRiso();
-  const breath = 1 + 0.04 * Math.sin(t * 1.8);
+  const breath = 1 + 0.03 * Math.sin(t * 1.8);
   const moonIn = ramp(t, 0.15, 0.6);
   const blink = t % 2.4 < 0.12 ? 0.2 : 1;
-  const moon = "M 0,-80 A 80 80 0 1 0 0,80 A 100 100 0 0 1 0,-80 Z";
+  const moon = "M 0,-60 A 60 60 0 1 0 0,60 A 75 75 0 0 1 0,-60 Z";
   const stars = [
-    [-230, -310, 0],
-    [-70, -380, 1.3],
-    [40, -240, 2.1],
-    [260, -110, 0.7],
+    [-235, -250, 0],
+    [-200, 60, 1.3],
+    [215, -110, 2.1],
+    [230, 150, 0.7],
   ];
-  const blanket = "M -150,40 C -150,-25 -50,-50 40,-42 C 140,-34 245,-22 270,40 Z";
+  const blanket = "M -128,-45 C -80,-58 -30,-40 0,-50 C 35,-60 85,-42 128,-50 L 128,218 L -128,218 Z";
   return (
     <g>
       {/* Lune et étoiles */}
-      <g transform={`translate(170, ${-270 + mix(30, 0, moonIn)})`} opacity={moonIn}>
-        <path d={moon} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+      <g transform={`translate(225, ${-255 + mix(25, 0, moonIn)})`} opacity={moonIn}>
+        <path d={moon} transform={`translate(${dx * 1.2}, ${dy * 1.2})`} fill={pal.shadow} opacity={0.92} />
         <path d={moon} {...ink(pal.fg, 7)} />
       </g>
       {stars.map(([x, y, ph], i) => {
         const o = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 3 + ph));
         return (
-          <path key={i} d={`M ${x - 14},${y} L ${x + 14},${y} M ${x},${y - 14} L ${x},${y + 14}`} {...ink(pal.fg, 5)} opacity={o * moonIn} />
+          <path key={i} d={`M ${x - 13},${y} L ${x + 13},${y} M ${x},${y - 13} L ${x},${y + 13}`} {...ink(pal.fg, 5)} opacity={o * moonIn} />
         );
       })}
-      {/* Lit */}
-      <path d="M -280,140 L -280,-90 M -250,140 L -250,-60 M -280,-90 C -275,-100 -255,-100 -250,-90" {...ink(pal.fg, 8)} />
-      <path d="M -250,40 L 280,40 L 280,140 M -250,100 L 280,100" {...ink(pal.fg, 8)} />
-      <ellipse cx={-185} cy={22} rx={58} ry={22} {...ink(pal.fg, 6)} />
-      {/* Tête, yeux grands ouverts */}
-      <circle cx={-172} cy={-14} r={34} {...ink(pal.fg, 7)} />
-      <circle cx={-184} cy={-20} r={5 * blink} fill={pal.fg} />
-      <circle cx={-162} cy={-20} r={5 * blink} fill={pal.fg} />
-      {/* Couverture qui respire, avec sa couche rouge */}
-      <g transform={`translate(0, 40) scale(1, ${breath}) translate(0, -40)`}>
+      {/* Lit vu de dessus : cadre, tête de lit, oreiller */}
+      <rect x={-140} y={-170} width={280} height={400} rx={18} {...ink(pal.fg, 8)} />
+      <path d="M -160,-178 L 160,-178" {...ink(pal.fg, 12)} />
+      <rect x={-95} y={-155} width={190} height={78} rx={32} {...ink(pal.fg, 6)} />
+      {/* Visage de face sur l'oreiller, yeux grands ouverts */}
+      <circle cx={0} cy={-108} r={44} fill={pal.bg} />
+      <circle cx={0} cy={-108} r={44} {...ink(pal.fg, 7)} />
+      <path d="M -40,-122 C -30,-158 30,-158 40,-122" {...ink(pal.fg, 6)} />
+      <circle cx={-15} cy={-108} r={9} {...ink(pal.fg, 4)} />
+      <circle cx={15} cy={-108} r={9} {...ink(pal.fg, 4)} />
+      <circle cx={-15} cy={-108} r={4.5 * blink} fill={pal.fg} />
+      <circle cx={15} cy={-108} r={4.5 * blink} fill={pal.fg} />
+      <path d="M -8,-84 L 8,-84" {...ink(pal.fg, 4)} />
+      {/* Couverture qui respire, avec sa couche rouge, et les mains qui la tiennent */}
+      <g transform={`translate(0, 85) scale(${breath}) translate(0, -85)`}>
         <path d={blanket} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
         <path d={blanket} fill={pal.bg} />
         <path d={blanket} {...ink(pal.fg, 8)} />
-        <path d="M -40,-20 C 0,-5 60,-8 110,-18" {...ink(pal.fg, 5)} opacity={0.6} />
+        <path d="M -128,-12 L 128,-20 M -60,40 C -40,110 -50,160 -30,210 M 55,30 C 70,100 60,150 80,210" {...ink(pal.fg, 4)} opacity={0.55} />
+        <circle cx={-48} cy={-50} r={14} fill={pal.bg} />
+        <circle cx={-48} cy={-50} r={14} {...ink(pal.fg, 5)} />
+        <circle cx={48} cy={-52} r={14} fill={pal.bg} />
+        <circle cx={48} cy={-52} r={14} {...ink(pal.fg, 5)} />
       </g>
     </g>
   );
@@ -166,11 +175,48 @@ const Blush: React.FC<P> = ({ t }) => {
   );
 };
 
+/** Couverture : au lit, on remonte la couverture jusqu'au nez ; yeux ronds, joues rouges. */
+const Covers: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const k = ramp(t, 0.3, 1.0, "inOut");
+  const pull = mix(150, 10, ramp(t, 0.2, 0.9, "inOut"));
+  const blink = t % 2.2 < 0.12 ? 0.2 : 1;
+  const edge = `M -260,${pull} C -150,${pull - 18} -60,${pull + 10} 0,${pull - 6} C 70,${pull - 20} 170,${pull + 8} 260,${pull - 4} L 260,260 L -260,260 Z`;
+  return (
+    <g>
+      <rect x={-230} y={-230} width={460} height={160} rx={60} {...ink(pal.fg, 7)} />
+      <circle cx={0} cy={-40} r={130} fill={pal.bg} />
+      <circle cx={0} cy={-40} r={130} {...ink(pal.fg, 8)} />
+      <path d="M -125,-80 C -110,-190 110,-190 125,-80" {...ink(pal.fg, 7)} />
+      {[-70, 70].map((x, i) => (
+        <ellipse key={i} cx={x + dx} cy={-5 + dy} rx={36 * mix(0.3, 1, k)} ry={22 * mix(0.3, 1, k)} fill={pal.accent} opacity={0.92 * k} />
+      ))}
+      <circle cx={-45} cy={-60} r={20} {...ink(pal.fg, 6)} />
+      <circle cx={45} cy={-60} r={20} {...ink(pal.fg, 6)} />
+      <circle cx={-45} cy={-60} r={8 * blink} fill={pal.fg} />
+      <circle cx={45} cy={-60} r={8 * blink} fill={pal.fg} />
+      <path d={edge} transform={`translate(${dx * 1.4}, ${dy * 1.4})`} fill={pal.shadow} opacity={0.92} />
+      <path d={edge} fill={pal.bg} />
+      <path d={edge} {...ink(pal.fg, 8)} />
+      {[-70, 70].map((x, i) => (
+        <g key={i}>
+          <circle cx={x} cy={pull - 4} r={22} fill={pal.bg} />
+          <circle cx={x} cy={pull - 4} r={22} {...ink(pal.fg, 6)} />
+        </g>
+      ))}
+    </g>
+  );
+};
+
 export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ layer, t }) => {
   const lt = t - (layer.at ?? 0);
   const k = ramp(lt, 0, 0.45);
   const inner =
-    layer.kind === "night" ? <Night t={lt} /> : layer.kind === "memory" ? <Memory t={lt} /> : <Blush t={lt} />;
+    layer.kind === "night" ? <Night t={lt} /> :
+    layer.kind === "memory" ? <Memory t={lt} /> :
+    layer.kind === "covers" ? <Covers t={lt} /> :
+    <Blush t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y + mix(50, 0, k)}) scale(${layer.scale})`} opacity={k}>
       {inner}

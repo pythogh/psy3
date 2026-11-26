@@ -18,8 +18,8 @@ const mascotMood = z
   .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée");
 
 const sceneKind = z
-  .enum(["night", "memory", "blush"])
-  .describe("Scène : nuit (lit sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit)");
+  .enum(["night", "memory", "blush", "covers"])
+  .describe("Scène : nuit (lit vu de dessus sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit), couverture (remontée jusqu’au nez)");
 
 const motifKind = z
   .enum(["spiral", "ripples", "waves", "knot", "orbit", "split"])
