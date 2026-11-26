@@ -25,6 +25,10 @@ const motifKind = z
   .enum(["spiral", "ripples", "waves", "knot", "orbit", "split"])
   .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue");
 
+const sfxName = z
+  .enum(["tick", "pop", "whoosh", "rustle", "crack", "buzz", "thud"])
+  .describe("Effet sonore discret au début du plan : clic, pop, souffle, froissement, craquement, vibreur, choc sourd");
+
 /* ── Texte ───────────────────────────────────────────────────────── */
 
 export const shotTextSchema = z.object({
@@ -220,6 +224,7 @@ export const shotSchema = z.object({
   shadow: z.boolean().optional().describe("Ombres portées (défaut : oui)"),
   layers: z.array(layerSchema).describe("Calques visuels, du fond vers l'avant"),
   text: shotTextSchema.optional(),
+  sfx: sfxName.optional(),
 });
 
 /* ── Style global ────────────────────────────────────────────────── */
@@ -276,6 +281,11 @@ const recipeCommon = {
   decor: z.enum(["none", "circle", "ring", "dashedRing", "square"]).optional().describe("Grande forme coupée par le cadre"),
   shadow: z.boolean().optional().describe("Ombres portées sur ce plan (défaut : oui). false = sans ombre"),
   startAt: z.number().min(0).max(600).optional().describe("Début dans la voix off (s)"),
+  frame: z
+    .enum(["center", "close", "left", "right", "small"])
+    .optional()
+    .describe("Cadrage du visuel : centré, gros plan, décalé à gauche, décalé à droite, petit"),
+  sfx: sfxName.optional(),
 };
 
 export const recipeShotSchema = z.discriminatedUnion("recipe", [

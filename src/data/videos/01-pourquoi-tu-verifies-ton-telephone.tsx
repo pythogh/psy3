@@ -10,7 +10,7 @@ import { calculateVideoMetadata, DEFAULT_FPS } from "../../engine/timing";
  * Important : les defaultProps sont écrits en clair (pas de constante ni de raccourci),
  * sinon npm run synchro et le Studio ne peuvent pas réécrire ce fichier.
  */
-export const TelephoneComposition: React.FC = () => (
+export const Video01Composition: React.FC = () => (
   <Composition
     id="verifier-telephone"
     component={Video}
@@ -372,13 +372,13 @@ export const TelephoneComposition: React.FC = () => (
         startAt: 48.35,
       }],
       audio: {
-        src: "voix/verifier-telephone.wav",
+        src: "voix/01-pourquoi-tu-verifies-ton-telephone.wav",
       },
     }}
   />
 );
 
-export const TelephoneVignette: React.FC = () => (
+export const Video01Vignette: React.FC = () => (
   <Composition
     id="verifier-telephone-vignette"
     component={Video}

@@ -95,6 +95,9 @@ const Planche: React.FC<{ shots: ShotData[] }> = ({ shots }) => {
   );
 };
 
+/** Volume des effets sonores : discrets, sous la voix. */
+const SFX_VOLUME = 0.22;
+
 /** Composition principale. Ses props sont les données de la vidéo (voir src/data/schema.ts). */
 export const Video: React.FC<VideoData> = (video) => {
   const { fps } = useVideoConfig();
@@ -124,6 +127,7 @@ export const Video: React.FC<VideoData> = (video) => {
             <ShotFrame entry={entry} next={timeline[entry.index + 1]}>
               <Shot shot={entry.shot} durationInFrames={entry.duration + entry.exitFrames} />
             </ShotFrame>
+            {entry.shot.sfx ? <Audio src={staticFile(`sfx/${entry.shot.sfx}.wav`)} volume={SFX_VOLUME} /> : null}
           </Sequence>
         ))}
         <Chrome video={video} timeline={timeline} />

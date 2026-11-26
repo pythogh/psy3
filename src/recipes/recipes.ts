@@ -202,6 +202,19 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
       break;
   }
 
+  // Cadrage : gros plan, décalé (coupé par le bord) ou petit, autour du centre du visuel
+  if (s.frame && s.frame !== "center") {
+    const vc = s.recipe === "words" ? 960 : vy + 40;
+    const keep = (z: number) => vc - (960 + z * (vc - 960));
+    const punch = s.camera === "punch" ? [Math.min(0.35, d * 0.3)] : undefined;
+    // En gros plan, le visuel s’éloigne un peu du texte pour ne pas le toucher
+    const away = textPos === "top" ? 70 : -70;
+    if (s.frame === "close") camera = { zoom: [1.5, 1.6], y: [keep(1.5) + away, keep(1.6) + away], punch };
+    if (s.frame === "small") camera = { zoom: [0.62, 0.65], y: [keep(0.62), keep(0.65)], punch };
+    if (s.frame === "left") camera = { zoom: [1.12, 1.16], x: [-250, -215], y: [keep(1.12), keep(1.16)], punch };
+    if (s.frame === "right") camera = { zoom: [1.12, 1.16], x: [250, 215], y: [keep(1.12), keep(1.16)], punch };
+  }
+
   // Décor : pour « words », un cercle par défaut pour ne jamais laisser un fond vide
   const decor = s.decor ?? (isWords ? "circle" : "none");
   layers = [...decorLayer(decor, bg, index), ...layers];
@@ -218,6 +231,7 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
     shadow: s.shadow,
     layers,
     text,
+    sfx: s.sfx,
   };
 };
 

@@ -35,7 +35,10 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
 
   const lines = item.text.split(/\s*\|\s*|\n/).map((l) => l.split(" ").filter(Boolean));
   const words = lines.flat();
-  const fontSize = fitFontSize(words, style.size, style.weight, theme.font.family, style.tracking, maxWidth);
+  const bare = (w: string) => w.replace(/\*/g, "");
+  // Sur le fond vert sauge, le rouge se lit mal : le mot clé est souligné en rouge à la place
+  const onSage = pal.bg === theme.palettes.accent.bg && styleName !== "term";
+  const fontSize = fitFontSize(words.map(bare), style.size, style.weight, theme.font.family, style.tracking, maxWidth);
 
   const at = item.at ?? 0.05;
   const spread = item.spread ?? Math.min(d * 0.6, words.length / WORDS_PER_SECOND);
@@ -90,8 +93,20 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
                 const p = ramp(t, start, WORD_IN);
                 return (
                   <span key={wi} style={{ display: "inline-block", overflow: "hidden", padding: "0.1em 0 0.08em", margin: "-0.1em 0 -0.08em" }}>
-                    <span style={{ display: "inline-block", transform: `translateY(${(1 - p) * 110}%)`, whiteSpace: "pre" }}>
-                      {word}
+                    <span
+                      style={{
+                        display: "inline-block",
+                        transform: `translateY(${(1 - p) * 110}%)`,
+                        whiteSpace: "pre",
+                        // Mot clé entre astérisques : en rouge (sur fond accent, il reste dans la couleur du texte mais souligné)
+                        color: /\*/.test(word) ? (onSage ? undefined : pal.accent) : undefined,
+                        textDecoration: /\*/.test(word) && onSage ? "underline" : undefined,
+                        textDecorationColor: pal.accent,
+                        textDecorationThickness: "0.08em",
+                        textUnderlineOffset: "0.12em",
+                      }}
+                    >
+                      {bare(word)}
                     </span>
                   </span>
                 );

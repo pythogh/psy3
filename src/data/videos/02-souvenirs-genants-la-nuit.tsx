@@ -4,9 +4,9 @@ import { videoSchema } from "../schema";
 import { Video } from "../../engine/Video";
 import { calculateVideoMetadata, DEFAULT_FPS } from "../../engine/timing";
 
-export const SouvenirGenantComposition: React.FC = () => (
+export const Video02Composition: React.FC = () => (
   <Composition
-    id="souvenir-genant"
+    id="02-souvenirs-genants-la-nuit"
     component={Video}
     schema={videoSchema}
     width={1080}
@@ -15,7 +15,7 @@ export const SouvenirGenantComposition: React.FC = () => (
     durationInFrames={1}
     calculateMetadata={calculateVideoMetadata}
     defaultProps={{
-      title: "Pourquoi ce souvenir gênant revient toujours la nuit ?",
+      title: "Pourquoi ce souvenir gênant revient toujours la nuit ?",
       style: {
         palettes: {
           cream: {
@@ -64,17 +64,17 @@ export const SouvenirGenantComposition: React.FC = () => (
         series: "",
       },
       script: [
-        "Tu rougis encore d’une gêne vieille de dix ans, à trois heures du matin ? Une phrase ratée, un « toi aussi » lancé au serveur… et la chaleur te remonte au visage, dans le noir.",
+        "Tu rougis encore d’une gêne vieille de dix ans, à trois heures du matin ? Une phrase ratée, un « toi aussi » lancé au serveur… et la chaleur te remonte au visage, dans le noir.",
         "La nuit, ton cerveau n’a plus rien à traiter. Pas d’écran, pas de bruit. Alors il vagabonde, souvent vers ce qui te concerne. Et la fatigue rend les émotions plus dures à apaiser.",
         "Or la gêne est une émotion sociale. Elle a touché ton image aux yeux des autres, donc ta mémoire l’a gardée. Pas seulement la scène… la sensation aussi.",
-        "Pourtant, essaie de te rappeler la dernière gêne d’un ami. Tu ne t’en souviens pas, n’est-ce pas ? Pour les autres, c’est pareil… ce moment qui t’empêche de dormir, ils l’ont sans doute oublié.",
-        "Alors, la prochaine fois qu’il revient à trois heures du matin, demande-toi… ce souvenir parle-t-il de ce que tu as fait, ou de ce que tu crains qu’on pense de toi ?",
+        "Pourtant, essaie de te rappeler la dernière gêne d’un ami. Tu ne t’en souviens pas, n’est-ce pas ? Pour les autres, c’est pareil… ce moment qui t’empêche de dormir, ils l’ont sans doute oublié.",
+        "Alors, la prochaine fois qu’il revient à trois heures du matin, demande-toi… ce souvenir parle-t-il de ce que tu as fait, ou de ce que tu crains qu’on pense de toi ?",
       ],
       shots: [{
         recipe: "scene",
         bg: "ink",
         duration: 2.1,
-        text: "Tu rougis encore | d’une gêne vieille | de dix ans ?",
+        text: "Tu rougis encore | d’une *gêne* vieille | de dix ans ?",
         textStyle: "hook",
         textPos: "top",
         kind: "night",
@@ -85,23 +85,25 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "cream",
         duration: 1.25,
         enter: "slam",
-        text: "À trois heures | du matin ?",
+        text: "À trois heures | du matin ?",
         kind: "ripples",
         startAt: 2.1,
+        frame: "small",
       }, {
         recipe: "words",
         bg: "ink",
         duration: 1.27,
         enter: "slam",
-        text: "Une phrase | ratée.",
+        text: "Une phrase | *ratée*.",
         decor: "none",
         startAt: 3.35,
+        camera: "punch",
       }, {
         recipe: "words",
         bg: "accent",
         duration: 2.37,
         enter: "slam",
-        text: "Un « toi aussi » | au serveur…",
+        text: "Un « toi aussi » | au serveur…",
         decor: "none",
         startAt: 4.62,
       }, {
@@ -109,9 +111,11 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "cream",
         duration: 2.08,
         enter: "slam",
-        text: "La chaleur | te remonte | au visage.",
+        text: "La *chaleur* | te remonte | au visage.",
         kind: "covers",
         startAt: 6.99,
+        frame: "close",
+        sfx: "rustle",
       }, {
         recipe: "mascot",
         bg: "ink",
@@ -127,7 +131,7 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "accent",
         duration: 1.48,
         enter: "wipe",
-        text: "La nuit, | ton cerveau…",
+        text: "La nuit, | ton *cerveau*…",
         decor: "none",
         startAt: 10.15,
       }, {
@@ -146,6 +150,7 @@ export const SouvenirGenantComposition: React.FC = () => (
         screen: "off",
         motion: "drop",
         startAt: 12.87,
+        frame: "right",
       }, {
         recipe: "words",
         bg: "cream",
@@ -159,17 +164,18 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "accent",
         duration: 1.73,
         enter: "zoom",
-        text: "Alors | il vagabonde,",
+        text: "Alors | il *vagabonde*,",
         kind: "knot",
         startAt: 14.39,
+        frame: "left",
       }, {
         recipe: "motif",
         bg: "ink",
         duration: 1.23,
         text: "vers ce qui | te concerne.",
         kind: "spiral",
-        camera: "push",
         startAt: 16.12,
+        frame: "right",
       }, {
         recipe: "words",
         bg: "cream",
@@ -182,9 +188,10 @@ export const SouvenirGenantComposition: React.FC = () => (
         recipe: "motif",
         bg: "accent",
         duration: 2.32,
-        text: "rend les émotions | plus dures | à apaiser.",
+        text: "rend les *émotions* | plus dures | à apaiser.",
         kind: "waves",
         startAt: 17.97,
+        frame: "left",
       }, {
         recipe: "words",
         bg: "ink",
@@ -198,15 +205,16 @@ export const SouvenirGenantComposition: React.FC = () => (
         recipe: "motif",
         bg: "cream",
         duration: 1.57,
-        text: "Ton image | aux yeux des autres.",
+        text: "Ton *image* | aux yeux des autres.",
         kind: "orbit",
         startAt: 23.1,
+        frame: "small",
       }, {
         recipe: "words",
         bg: "accent",
         duration: 1.46,
         enter: "slam",
-        text: "Ta mémoire | l’a gardée.",
+        text: "Ta mémoire | l’a *gardée*.",
         decor: "none",
         startAt: 24.67,
       }, {
@@ -221,31 +229,33 @@ export const SouvenirGenantComposition: React.FC = () => (
         recipe: "motif",
         bg: "cream",
         duration: 2.64,
-        text: "la sensation | aussi.",
+        text: "la *sensation* | aussi.",
         kind: "split",
         startAt: 27.55,
+        frame: "close",
+        sfx: "crack",
       }, {
         recipe: "words",
         bg: "accent",
         duration: 2.48,
         enter: "slide",
-        text: "Essaie de te rappeler | la gêne d’un ami.",
+        text: "Essaie de te rappeler | la gêne d’un *ami*.",
         decor: "none",
         startAt: 30.19,
       }, {
         recipe: "motif",
         bg: "ink",
         duration: 1.76,
-        text: "Tu ne t’en | souviens pas ?",
+        text: "Tu ne t’en | souviens pas ?",
         kind: "ripples",
-        camera: "pull",
         startAt: 32.67,
+        frame: "close",
       }, {
         recipe: "words",
         bg: "cream",
         duration: 1.68,
         enter: "slam",
-        text: "Pour les autres, | c’est pareil…",
+        text: "Pour les autres, | c’est *pareil*…",
         decor: "none",
         startAt: 34.43,
       }, {
@@ -263,7 +273,7 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "cream",
         duration: 2.35,
         enter: "slam",
-        text: "ils l’ont sans doute | oublié.",
+        text: "ils l’ont sans doute | *oublié*.",
         decor: "none",
         startAt: 38.03,
       }, {
@@ -274,6 +284,7 @@ export const SouvenirGenantComposition: React.FC = () => (
         text: "La prochaine fois | qu’il revient…",
         kind: "orbit",
         startAt: 40.38,
+        frame: "right",
       }, {
         recipe: "words",
         bg: "cream",
@@ -295,7 +306,7 @@ export const SouvenirGenantComposition: React.FC = () => (
         bg: "ink",
         duration: 4.16,
         enter: "fade",
-        text: "Ce que tu as fait… | ou ce que tu crains | qu’on pense de toi ?",
+        text: "Ce que tu as fait… | ou ce que tu *crains* | qu’on pense de toi ?",
         mood: "perplexe",
         size: "medium",
         position: "bottom",
@@ -303,15 +314,15 @@ export const SouvenirGenantComposition: React.FC = () => (
         startAt: 45.53,
       }],
       audio: {
-        src: "voix/souvenir-genant.wav",
+        src: "voix/02-souvenirs-genants-la-nuit.wav",
       },
     }}
   />
 );
 
-export const SouvenirGenantVignette: React.FC = () => (
+export const Video02Vignette: React.FC = () => (
   <Composition
-    id="souvenir-genant-vignette"
+    id="02-souvenirs-genants-la-nuit-vignette"
     component={Video}
     schema={videoSchema}
     width={1080}

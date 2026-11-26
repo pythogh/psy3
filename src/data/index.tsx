@@ -1,17 +1,16 @@
 import React from "react";
-import { TelephoneComposition, TelephoneVignette } from "./videos/telephone";
-import { SouvenirGenantComposition, SouvenirGenantVignette } from "./videos/souvenir-genant";
+import { Video01Composition, Video01Vignette } from "./videos/01-pourquoi-tu-verifies-ton-telephone";
+import { Video02Composition, Video02Vignette } from "./videos/02-souvenirs-genants-la-nuit";
 
 /**
  * Liste des vidéos du projet. Chaque vidéo est un fichier dans src/data/videos/
- * qui déclare sa composition et contient tous ses réglages.
- * Pour en ajouter une : duplique telephone.tsx, change l'id et le nom du composant, ajoute-le ici.
+ * nommé NN-sujet-en-clair.tsx, avec ses composants VideoNNComposition et VideoNNVignette.
  */
 export const Videos: React.FC = () => (
   <>
-    <TelephoneComposition />
-    <TelephoneVignette />
-    <SouvenirGenantComposition />
-    <SouvenirGenantVignette />
+    <Video01Composition />
+    <Video01Vignette />
+    <Video02Composition />
+    <Video02Vignette />
   </>
 );
