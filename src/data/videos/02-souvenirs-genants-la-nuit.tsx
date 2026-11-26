@@ -114,7 +114,6 @@ export const Video02Composition: React.FC = () => (
         text: "La *chaleur* | te remonte | au visage.",
         kind: "covers",
         startAt: 6.99,
-        frame: "close",
         sfx: "rustle",
       }, {
         recipe: "mascot",
@@ -131,7 +130,7 @@ export const Video02Composition: React.FC = () => (
         bg: "accent",
         duration: 1.48,
         enter: "wipe",
-        text: "La nuit, | ton *cerveau*…",
+        text: "La nuit, | ton cerveau…",
         decor: "none",
         startAt: 10.15,
       }, {
@@ -164,10 +163,9 @@ export const Video02Composition: React.FC = () => (
         bg: "accent",
         duration: 1.73,
         enter: "zoom",
-        text: "Alors | il *vagabonde*,",
+        text: "Alors | il vagabonde,",
         kind: "knot",
         startAt: 14.39,
-        frame: "left",
       }, {
         recipe: "motif",
         bg: "ink",
@@ -175,7 +173,6 @@ export const Video02Composition: React.FC = () => (
         text: "vers ce qui | te concerne.",
         kind: "spiral",
         startAt: 16.12,
-        frame: "right",
       }, {
         recipe: "words",
         bg: "cream",
@@ -191,7 +188,6 @@ export const Video02Composition: React.FC = () => (
         text: "rend les *émotions* | plus dures | à apaiser.",
         kind: "waves",
         startAt: 17.97,
-        frame: "left",
       }, {
         recipe: "words",
         bg: "ink",
@@ -214,7 +210,7 @@ export const Video02Composition: React.FC = () => (
         bg: "accent",
         duration: 1.46,
         enter: "slam",
-        text: "Ta mémoire | l’a *gardée*.",
+        text: "Ta mémoire | l’a gardée.",
         decor: "none",
         startAt: 24.67,
       }, {
@@ -226,14 +222,13 @@ export const Video02Composition: React.FC = () => (
         decor: "none",
         startAt: 26.13,
       }, {
-        recipe: "motif",
+        recipe: "scene",
         bg: "cream",
         duration: 2.64,
         text: "la *sensation* | aussi.",
-        kind: "split",
+        kind: "heart",
         startAt: 27.55,
-        frame: "close",
-        sfx: "crack",
+        sfx: "thud",
       }, {
         recipe: "words",
         bg: "accent",
@@ -273,7 +268,7 @@ export const Video02Composition: React.FC = () => (
         bg: "cream",
         duration: 2.35,
         enter: "slam",
-        text: "ils l’ont sans doute | *oublié*.",
+        text: "ils l’ont sans doute | oublié.",
         decor: "none",
         startAt: 38.03,
       }, {
@@ -284,7 +279,6 @@ export const Video02Composition: React.FC = () => (
         text: "La prochaine fois | qu’il revient…",
         kind: "orbit",
         startAt: 40.38,
-        frame: "right",
       }, {
         recipe: "words",
         bg: "cream",

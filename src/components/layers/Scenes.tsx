@@ -183,8 +183,9 @@ const Covers: React.FC<P> = ({ t }) => {
   const pull = mix(150, 10, ramp(t, 0.2, 0.9, "inOut"));
   const blink = t % 2.2 < 0.12 ? 0.2 : 1;
   const edge = `M -260,${pull} C -150,${pull - 18} -60,${pull + 10} 0,${pull - 6} C 70,${pull - 20} 170,${pull + 8} 260,${pull - 4} L 260,260 L -260,260 Z`;
+  // Plus petite que les autres scènes à l'échelle 1 : le personnage ne doit pas envahir le cadre
   return (
-    <g>
+    <g transform="scale(0.72)">
       <rect x={-230} y={-230} width={460} height={160} rx={60} {...ink(pal.fg, 7)} />
       <circle cx={0} cy={-40} r={130} fill={pal.bg} />
       <circle cx={0} cy={-40} r={130} {...ink(pal.fg, 8)} />
@@ -209,6 +210,31 @@ const Covers: React.FC<P> = ({ t }) => {
   );
 };
 
+/** Cœur : une silhouette en buste, un point rouge bat dans la poitrine et des ondes partent du corps (la sensation qui reste). */
+const Heart: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const k = ramp(t, 0.3, 0.6);
+  const beat = 1 + 0.12 * Math.max(0, Math.sin(t * 6.5));
+  const body = "M -190,230 C -190,60 -120,-40 0,-45 C 120,-40 190,60 190,230";
+  return (
+    <g>
+      {[0, 1, 2].map((i) => {
+        const ph = (t * 0.7 + i / 3) % 1;
+        return <circle key={i} cx={0} cy={60} r={60 + 200 * ph} {...ink(pal.shadow, 7)} opacity={(1 - ph) * k} />;
+      })}
+      <circle cx={0} cy={-150} r={80} fill={pal.bg} />
+      <circle cx={0} cy={-150} r={80} {...ink(pal.fg, 8)} />
+      <path d={body} fill={pal.bg} />
+      <path d={body} {...ink(pal.fg, 8)} />
+      <g transform={`translate(0, 60) scale(${beat * k})`}>
+        <circle cx={dx} cy={dy} r={48} fill={pal.shadow} opacity={0.92} />
+        <circle r={48} {...ink(pal.fg, 6)} />
+      </g>
+    </g>
+  );
+};
+
 export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ layer, t }) => {
   const lt = t - (layer.at ?? 0);
   const k = ramp(lt, 0, 0.45);
@@ -216,6 +242,7 @@ export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ l
     layer.kind === "night" ? <Night t={lt} /> :
     layer.kind === "memory" ? <Memory t={lt} /> :
     layer.kind === "covers" ? <Covers t={lt} /> :
+    layer.kind === "heart" ? <Heart t={lt} /> :
     <Blush t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y + mix(50, 0, k)}) scale(${layer.scale})`} opacity={k}>

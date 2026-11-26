@@ -74,22 +74,23 @@ const Ripples: React.FC<P> = ({ t }) => {
   );
 };
 
-/** Lignes ondulées superposées dont l'amplitude monte (émotion qui enfle). */
+/** Lignes ondulées qui traversent tout l'écran de gauche à droite, et dont l'amplitude monte (émotion qui enfle). */
 const Waves: React.FC<P> = ({ t }) => {
   const pal = usePalette();
   const { dx, dy } = useRiso();
-  const amp = mix(5, 42, ramp(t, 0.1, 1.3, "inOut"));
+  const amp = mix(6, 42, ramp(t, 0.2, 1.4, "inOut"));
   return (
     <g>
       {[0, 1, 2, 3, 4].map((i) => {
         const a = amp * (1 - Math.abs(i - 2) * 0.22);
         const pts: [number, number][] = [];
-        for (let x = -280; x <= 280; x += 14) pts.push([x, -170 + i * 85 + a * Math.sin(x * 0.026 + t * 3 + i * 0.9)]);
+        for (let x = -660; x <= 660; x += 14) pts.push([x, -170 + i * 85 + a * Math.sin(x * 0.024 + t * 3 + i * 0.9)]);
         const d = toPath(pts);
+        const dash = { pathLength: 1, strokeDasharray: 1, strokeDashoffset: 1 - ramp(t, i * 0.07, 0.9, "inOut") };
         return (
-          <g key={i} opacity={ramp(t, i * 0.07, 0.3)}>
-            {i === 2 ? <path d={d} {...ink(pal.shadow, 16)} opacity={0.9} transform={`translate(${dx}, ${dy})`} /> : null}
-            <path d={d} {...ink(pal.fg, 7)} />
+          <g key={i}>
+            {i === 2 ? <path d={d} {...ink(pal.shadow, 16)} {...dash} opacity={0.9} transform={`translate(${dx}, ${dy})`} /> : null}
+            <path d={d} {...ink(pal.fg, 7)} {...dash} />
           </g>
         );
       })}

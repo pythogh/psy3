@@ -70,6 +70,16 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
       }
     : {};
 
+  // Citation entre guillemets « … » : écrite en clair sur une bande d'encre continue, qui se déroule avec les mots
+  const inQuote: boolean[] = [];
+  {
+    let q = false;
+    for (const w of words) {
+      if (w.includes("«")) q = true;
+      inQuote.push(q);
+      if (w.includes("»")) q = false;
+    }
+  }
   let k = 0;
   return (
     <div style={{ position: "absolute", left: marginX, right: marginX, ...box, height: pos === "center" ? undefined : "auto" }}>
@@ -91,22 +101,49 @@ export const KineticText: React.FC<{ item: ShotText; t: number; d: number }> = (
                 const i = k++;
                 const start = at + (words.length > 1 ? (spread * i) / (words.length - 1) : 0);
                 const p = ramp(t, start, WORD_IN);
+                const quoted = inQuote[i];
+                const quoteStart = quoted && (i === 0 || !inQuote[i - 1] || wi === 0);
+                const quoteEnd = quoted && (i === words.length - 1 || !inQuote[i + 1] || wi === line.length - 1);
+                const band: React.CSSProperties = quoted
+                  ? {
+                      // La bande couvre aussi l'espace entre les mots : pas de trou dans la citation
+                      backgroundImage: `linear-gradient(${pal.fg}, ${pal.fg})`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: `${ramp(t, start, WORD_IN + 0.05) * 100}% 100%`,
+                      paddingLeft: quoteStart ? "0.16em" : 0,
+                      paddingRight: quoteEnd ? "0.16em" : "0.24em",
+                      marginRight: quoteEnd ? 0 : "-0.24em",
+                      borderRadius: `${quoteStart ? "0.1em" : 0} ${quoteEnd ? "0.1em" : 0} ${quoteEnd ? "0.1em" : 0} ${quoteStart ? "0.1em" : 0}`,
+                    }
+                  : {};
                 return (
-                  <span key={wi} style={{ display: "inline-block", overflow: "hidden", padding: "0.1em 0 0.08em", margin: "-0.1em 0 -0.08em" }}>
+                  <span key={wi} style={{ display: "inline-block", overflow: "hidden", padding: "0.1em 0 0.08em", margin: "-0.1em 0 -0.08em", ...band }}>
                     <span
                       style={{
                         display: "inline-block",
+                        position: "relative",
                         transform: `translateY(${(1 - p) * 110}%)`,
                         whiteSpace: "pre",
-                        // Mot clé entre astérisques : en rouge (sur fond accent, il reste dans la couleur du texte mais souligné)
-                        color: /\*/.test(word) ? (onSage ? undefined : pal.accent) : undefined,
-                        textDecoration: /\*/.test(word) && onSage ? "underline" : undefined,
-                        textDecorationColor: pal.accent,
-                        textDecorationThickness: "0.08em",
-                        textUnderlineOffset: "0.12em",
+                        // Mot clé entre astérisques : en rouge, ou souligné en rouge (trait qui se dessine) sur le fond vert
+                        color: quoted ? pal.bg : /\*/.test(word) && !onSage ? pal.accent : undefined,
                       }}
                     >
                       {bare(word)}
+                      {/\*/.test(word) && onSage ? (
+                        <span
+                          style={{
+                            position: "absolute",
+                            left: "-0.02em",
+                            right: "-0.02em",
+                            bottom: "0.04em",
+                            height: "0.085em",
+                            borderRadius: "0.05em",
+                            background: pal.accent,
+                            transform: `scaleX(${ramp(t, start + WORD_IN * 0.8, 0.4)}) rotate(-0.6deg)`,
+                            transformOrigin: "left center",
+                          }}
+                        />
+                      ) : null}
                     </span>
                   </span>
                 );

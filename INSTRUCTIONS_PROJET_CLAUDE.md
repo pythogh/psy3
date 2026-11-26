@@ -21,8 +21,8 @@ Je relis et je corrige le texte si besoin.
 
 ÉTAPE 2 BIS, si je valide une nouvelle recette : crée-la selon la partie « Nouvelles recettes », avant le découpage.
 
-ÉTAPE 2, quand je valide le script : fais le découpage en plans et livre le fichier complet `src/data/videos/<id>.tsx` en fichier téléchargeable, selon le modèle ci-dessous, avec le champ `script` rempli, les plans numérotés /* n */ et la vignette /* 0 */. Ne réaffiche pas son contenu dans la réponse.
-Rappelle-moi en une ligne d’ajouter les deux compositions dans src/data/index.tsx (leurs imports et leurs balises, ex. <TelephoneComposition /> et <TelephoneVignette />).
+ÉTAPE 2, quand je valide le script : fais le découpage en plans et livre le fichier complet `src/data/videos/<id>.tsx` (voir « Nommage ») en fichier téléchargeable, selon le modèle ci-dessous, avec le champ `script` rempli, les plans numérotés /* n */ et la vignette /* 0 */. Ne réaffiche pas son contenu dans la réponse.
+Rappelle-moi en une ligne d’ajouter les deux compositions dans src/data/index.tsx (leurs imports et leurs balises, ex. <Video03Composition /> et <Video03Vignette />).
 Termine par le kit de publication TikTok, prêt à copier :
 - le script pour la voix, en texte brut, paragraphe par paragraphe ;
 - la légende : une phrase d’accroche en « tu » qui reprend les mots que le public taperait dans la recherche TikTok (le comportement, l’objet, « psychologie »), puis 3 à 5 hashtags en fin de légende : toujours #psychologie, puis des hashtags percutants et pertinents que le public cherche vraiment sur ce sujet ; jamais #psycholitchi, #fyp ni de mot de diagnostic ou de pathologie ;
@@ -30,14 +30,25 @@ Termine par le kit de publication TikTok, prêt à copier :
 - la source (auteurs, année), seulement si la vidéo cite une étude, à vérifier par moi avant de la poster.
 
 ÉTAPE 3, de mon côté (tu n’as rien à faire) :
+- avant la voix, je peux valider les visuels avec `npm run planche -- <id>` (si besoin, un fichier muet provisoire dans public/voix/<id>.wav) ;
 - j’enregistre la voix (cliputils.com ou ma voix) en lisant le script tel quel, et je la dépose dans public/voix/<id>.wav ;
 - je lance `npm run verifier -- <id>` : vérification du code, calage des plans sur la voix par Whisper, puis planche (si le fichier a un autre nom : `npm run verifier -- <id> --audio public/voix/<fichier>.wav`) ;
 - j’exporte la vidéo et la vignette avec `npm run export -- <id>`, puis je les télécharge avec `npm run telecharger`, et je choisis la vignette comme couverture dans TikTok.
+- si j’ai ensuite retouché les durées à la main, je ne relance plus `verifier` (la synchro les écraserait) : seulement `npm run planche`, puis `npm run export`.
 La musique de fond est ajoutée dans TikTok au moment de publier, pas dans le projet.
 
 ÉTAPE 4, quand je signale des corrections par numéro de plan : renvoie toujours le fichier complet modifié, en fichier téléchargeable, et liste en une ligne par plan ce qui a changé. Si des plans sont ajoutés, supprimés ou fusionnés, renumérote. Après une synchro, si je ne corrige que la vignette, donne seulement le bloc de la vignette, pour ne pas écraser les timings.
 
-Ne fais pas de rendu toi-même. Si je te montre la planche, commente seulement les plans à corriger.
+Livraison des fichiers : dès qu’il y a plus d’un fichier à installer, ou un fichier du moteur, livre un seul zip nommé `maj-<id ou sujet>.zip`, avec les chemins du projet (src/…, public/…, scripts/…). Je le glisse à la racine et je lance `npm run maj`, qui met tout en place, supprime le zip et vérifie le code. Un fichier vidéo seul peut aussi passer par ce zip.
+
+Ne fais pas le rendu de la vidéo à ma place. Pour une nouvelle recette, vérifie son rendu toi-même avant de la livrer quand tu as accès au dépôt (github.com/pythogh/psycholitchi, avec les fichiers que je t’ai envoyés). Si je te montre la planche, commente seulement les plans à corriger.
+
+Quand je dis que je n’aime pas un visuel, propose deux ou trois alternatives (avec un aperçu si possible) au lieu de le supprimer ou de le remplacer d’office.
+
+# Nommage
+- Chaque vidéo a un numéro sur deux chiffres et un nom explicite : id `NN-sujet-en-clair` (ex. `03-souvenirs-genants-la-nuit`), fichier `src/data/videos/NN-sujet-en-clair.tsx`, vignette `NN-sujet-en-clair-vignette`, voix `public/voix/NN-sujet-en-clair.wav`, audio src `voix/NN-sujet-en-clair.wav`.
+- Les composants s’appellent `VideoNNComposition` et `VideoNNVignette` (un nom de composant ne peut pas commencer par un chiffre).
+- Demande-moi le numéro de la vidéo si je ne l’ai pas donné.
 
 # Économie
 Réponses courtes. Ne relis pas et ne réécris pas le code du moteur en dehors des nouvelles recettes. Une conversation par vidéo.
@@ -50,6 +61,7 @@ Réponses courtes. Ne relis pas et ne réécris pas le code du moteur en dehors 
 - Pour la créer, demande-moi les fichiers du moteur dont tu as besoin (registre des recettes, schéma des plans, une recette existante comme modèle) si tu ne les as pas déjà dans le Project. Ne devine jamais la structure du moteur.
 - Livre le ou les fichiers complets, en fichiers téléchargeables, avec leur chemin, et la ligne exacte à ajouter au registre et au schéma. Ne touche à rien d’autre dans le moteur.
 - Respecte la direction artistique : trait d’encre légèrement tremblé, couche rouge décalée (réglage riso), palette du style, sans couleur en dur. La recette doit laisser de la place au texte et fonctionner sur les trois fonds.
+- Ce qui me plaît : des scènes concrètes, simples et drôles, vues du point de vue de la personne (ex. la couverture remontée jusqu’au nez) ; des formes abstraites nouvelles et expressives. Toujours une perspective cohérente (pas de visage de face sur un lit vu de côté) et jamais de dessin caché par le texte.
 - Donne enfin la ligne à ajouter au catalogue ci-dessous (nom, ce qu’elle montre, ses paramètres), pour que je mette à jour ces instructions.
 - Si je refuse la création, utilise la recette existante la plus proche.
 
@@ -71,9 +83,9 @@ Réponses courtes. Ne relis pas et ne réécris pas le code du moteur en dehors 
 
 # Format d’un plan
 /* 1 */ { recipe: "phone", bg: "ink", duration: 1.6, text: "Tu déverrouilles | ton téléphone.", screen: "unlock" },
-Le signe | force un retour à la ligne dans le texte affiché.
+Le signe | force un retour à la ligne dans le texte affiché. Un mot entre astérisques (ex. "d’une *gêne* vieille") s’affiche en rouge (sur fond vert, un trait rouge se dessine dessous) : un mot clé par plan au maximum, sur un tiers des plans environ, jamais un mot vide ; deux ou trois soulignés par vidéo au plus. Une phrase citée (ce que quelqu’un dit) s’écrit entre « » dans le texte affiché : elle apparaît automatiquement en clair sur une bande d’encre.
 
-Champs communs : recipe, text, duration (s), bg (cream | ink | accent, défaut cream), enter (cut | slam | fade | rise | slide | zoom | wipe, défaut cut), camera (push | pull | still | drift | punch), textStyle (giant | hook | title | body | term, auto ; term = notion clé posée sur une étiquette, à réserver au terme psychologique central de la vidéo, une ou deux fois), textPos (top | center | bottom, auto), decor (none | circle | ring | dashedRing | square), shadow (false = sans ombre sur ce plan), startAt.
+Champs communs : recipe, text, duration (s), frame (center | close | left | right | small : cadrage du visuel, gros plan, décalé et coupé par le bord, ou petit), sfx (voir « Effets sonores »), bg (cream | ink | accent, défaut cream), enter (cut | slam | fade | rise | slide | zoom | wipe, défaut cut), camera (push | pull | still | drift | punch), textStyle (giant | hook | title | body | term, auto ; term = notion clé posée sur une étiquette, à réserver au terme psychologique central de la vidéo, une ou deux fois), textPos (top | center | bottom, auto), decor (none | circle | ring | dashedRing | square), shadow (false = sans ombre sur ce plan), startAt.
 
 Catalogue des recettes :
 - phone : un téléphone. screen: off | on | unlock | flash ; motion: float | drop | pop | shake | none ; notify: true.
@@ -85,12 +97,13 @@ Catalogue des recettes :
 - dot : un point. mode: fill | empty | fillToEmpty.
 - ground : un téléphone qui surgit d’une ligne, mécaniquement. pace: slow | fast.
 - context : un décor seul, centré, qui surgit du sol. kind: elevator | queue.
-- scene : petite illustration en trait d’encre avec couche rouge, qui apparaît en montant. kind: night (lit sous la lune, couverture qui respire, yeux ouverts) | memory (bulles qui remontent, grande bulle avec un personnage qui rougit) | blush (visage qui détourne le regard, joues qui rougissent, goutte, chaleur).
-- motif : forme abstraite en trait d’encre avec couche rouge. kind: spiral (spirale qui s’enroule) | ripples (ondes qui partent d’un point) | waves (lignes ondulées qui enflent) | knot (fil qui s’emmêle en se dessinant) | orbit (petites formes qui tournent autour d’un centre) | split (cercle qui se fend, une moitié rouge).
+- scene : petite illustration en trait d’encre avec couche rouge, qui apparaît en montant. kind: night (lit vu de dessus sous la lune, couverture qui respire, yeux ouverts) | blush (visage qui détourne le regard, joues qui rougissent, goutte, chaleur) | covers (au lit, la couverture remonte jusqu’au nez, yeux ronds, joues rouges).
+- motif : forme abstraite en trait d’encre avec couche rouge. kind: spiral (spirale qui s’enroule) | ripples (ondes qui partent d’un point) | waves (lignes ondulées qui enflent) | knot (fil qui s’emmêle en se dessinant) | orbit (petites formes qui tournent autour d’un centre) | split (cercle qui se fend en zigzag : une moitié hachurée, l’autre rouge qui bat, des éclats).
 - mascot : la mascotte de la chaîne, un litchi au style risographie (couche rouge décalée sous un trait d’encre, écailles, petite tige sèche), qui apparaît en fondu puis flotte doucement. mood: content | perplexe (penché, petit « ? ») | surpris | reveur (yeux fermés, bulle) | gene (regard de côté, goutte) ; size: small | medium | large ; position: center | bottom (le texte passe en haut) | corner (petite, dans un coin, pour accompagner un texte). Deux ou trois plans par vidéo au maximum, plutôt aux moments où le spectateur se reconnaît. Ex. : /* 4 */ { recipe: "mascot", bg: "cream", duration: 1.6, text: "Et pourtant… | tu recommences.", mood: "perplexe" },
 
 À éviter (rendu jugé raté) :
 - reach (la main) ;
+- scene kind: "memory" (la bulle de souvenir) ;
 - context kind: "hourglass" (le sablier) ;
 - timeline (barres mal posées sur l’axe) ;
 - pattern avec close: true (la grille déborde en haut à gauche) ;
@@ -99,10 +112,14 @@ Catalogue des recettes :
 # Direction artistique
 Risographie et ligne organique : crème, encre et vert sauge, avec le rouge litchi comme seule couleur d’accent. Les visuels ont un trait d’encre légèrement tremblé et une couche rouge décalée texturée (réglage riso du style). Ne pas modifier la palette sauf demande de nouvelle DA.
 
+# Effets sonores
+Banque dans public/sfx : tick (clic), pop, whoosh (souffle), rustle (froissement de tissu), crack (craquement), buzz (vibreur), thud (choc sourd). Deux ou trois par vidéo au maximum, seulement quand le son correspond à ce qu’on voit (couverture → rustle, forme qui se fend → crack, téléphone → buzz). S’il n’y en a aucun de pertinent, n’en mets pas. Je peux te demander d’en fabriquer d’autres.
+
 # Règles de montage
+Éviter le montage « plat » (même construction à chaque plan) : varier les cadrages sur environ un plan sur cinq (frame close ou small pour les formes abstraites, left ou right plutôt pour les objets et les scènes ; une forme symétrique comme la spirale ou l’orbite reste centrée), mettre un mot clé en rouge sur un tiers des plans environ, casser le rythme de temps en temps (une rafale de deux ou trois plans très courts, puis un plan tenu ; camera punch sur un mot fort). Pas de tremblements ni de transitions tape-à-l’œil.
 Alterner les fonds ; pas trois fois la même recette d’affilée ; slam pour les coupes nettes, wipe/slide/rise pour changer de partie, fade pour la conclusion ; giant : 1 à 3 mots par ligne, 4 lignes maximum ; 25 à 36 plans pour une minute.
 
-# Modèle de fichier (remplacer <id>, <Nom>, <titre>, le script, les plans et la vignette ; ne pas changer le reste sauf demande de nouvelle DA)
+# Modèle de fichier (remplacer <id>, <NN>, <titre>, le script, les plans et la vignette ; ne pas changer le reste sauf demande de nouvelle DA)
 Les defaultProps s’écrivent toujours en clair : pas de constante, pas de raccourci (title, style…), pas de « ... », sinon `npm run synchro` et le Studio ne peuvent pas réécrire le fichier.
 
 import React from "react";
@@ -111,7 +128,7 @@ import { videoSchema } from "../schema";
 import { Video } from "../../engine/Video";
 import { calculateVideoMetadata, DEFAULT_FPS } from "../../engine/timing";
 
-export const <Nom>Composition: React.FC = () => (
+export const Video<NN>Composition: React.FC = () => (
   <Composition
     id="<id>"
     component={Video}
@@ -147,7 +164,7 @@ export const <Nom>Composition: React.FC = () => (
   />
 );
 
-export const <Nom>Vignette: React.FC = () => (
+export const Video<NN>Vignette: React.FC = () => (
   <Composition
     id="<id>-vignette"
     component={Video}
