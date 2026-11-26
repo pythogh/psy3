@@ -17,6 +17,14 @@ const mascotMood = z
   .enum(["content", "perplexe", "surpris", "reveur", "gene"])
   .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée");
 
+const sceneKind = z
+  .enum(["night", "memory", "blush"])
+  .describe("Scène : nuit (lit sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit)");
+
+const motifKind = z
+  .enum(["spiral", "ripples", "waves", "knot", "orbit", "split"])
+  .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue");
+
 /* ── Texte ───────────────────────────────────────────────────────── */
 
 export const shotTextSchema = z.object({
@@ -164,6 +172,24 @@ const mascotLayer = z.object({
   enterAt: seconds().optional().describe("Instant d'entrée en rebond (s)"),
 });
 
+const sceneLayer = z.object({
+  type: z.literal("scene"),
+  kind: sceneKind,
+  x: px.describe("Centre de la scène (px)"),
+  y: px.describe("Centre de la scène (px)"),
+  scale: z.number().min(0.1).max(4).describe("Échelle (environ 600 px de large à 1)"),
+  at: seconds().optional().describe("Instant d'apparition (s)"),
+});
+
+const motifLayer = z.object({
+  type: z.literal("motif"),
+  kind: motifKind,
+  x: px.describe("Centre du motif (px)"),
+  y: px.describe("Centre du motif (px)"),
+  scale: z.number().min(0.1).max(4).describe("Échelle (environ 600 px de large à 1)"),
+  at: seconds().optional().describe("Instant d'apparition (s)"),
+});
+
 export const layerSchema = z.discriminatedUnion("type", [
   phoneLayer,
   phoneRowLayer,
@@ -176,6 +202,8 @@ export const layerSchema = z.discriminatedUnion("type", [
   timelineLayer,
   reachLayer,
   mascotLayer,
+  sceneLayer,
+  motifLayer,
 ]);
 
 /* ── Plan ────────────────────────────────────────────────────────── */
@@ -293,6 +321,8 @@ export const recipeShotSchema = z.discriminatedUnion("recipe", [
     size: z.enum(["small", "medium", "large"]).optional().describe("Taille de la mascotte"),
     position: z.enum(["center", "bottom", "corner"]).optional().describe("Place : centre, en bas (texte en haut), dans un coin"),
   }),
+  z.object({ recipe: z.literal("scene"), ...recipeCommon, kind: sceneKind }),
+  z.object({ recipe: z.literal("motif"), ...recipeCommon, kind: motifKind }),
   z.object({
     recipe: z.literal("custom"),
     ...recipeCommon,

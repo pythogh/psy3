@@ -188,6 +188,14 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
       if (!s.camera) camera = CAMERAS.still(d);
       break;
     }
+    case "scene":
+      // Petite illustration en trait d'encre (voir components/layers/Scenes.tsx)
+      layers = [{ type: "scene", kind: s.kind, x: 540, y: vy + 40, scale: textPos === "top" ? 0.95 : 1.1, at: 0.05 }];
+      break;
+    case "motif":
+      // Forme abstraite en trait d'encre (voir components/layers/Motifs.tsx)
+      layers = [{ type: "motif", kind: s.kind, x: 540, y: vy + 40, scale: textPos === "top" ? 0.95 : 1.05, at: 0.05 }];
+      break;
     case "custom":
       layers = s.layers;
       if (s.cameraDetail) camera = s.cameraDetail;

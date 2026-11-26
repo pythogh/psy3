@@ -1,6 +1,7 @@
 import React from "react";
 import type { Layer } from "../../data/types";
 import { Mascot } from "./Mascot";
+import { Scene } from "./Scenes";
 import { PhoneGrid, PhoneRow, PhoneView, Reach } from "./PhoneLayers";
 import { Counter, Dot, Ground, Pattern, Shape, Timeline } from "./ShapeLayers";
 
@@ -29,5 +30,7 @@ export const renderLayer = (layer: Layer, t: number, d: number, key: string): Re
       return <Timeline key={key} layer={layer} t={t} d={d} />;
     case "mascot":
       return <Mascot key={key} layer={layer} t={t} d={d} />;
+    case "scene":
+      return <Scene key={key} layer={layer} t={t} d={d} />;
   }
 };

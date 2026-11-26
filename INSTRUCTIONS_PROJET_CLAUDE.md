@@ -43,7 +43,9 @@ Ne fais pas de rendu toi-même. Si je te montre la planche, commente seulement l
 Réponses courtes. Ne relis pas et ne réécris pas le code du moteur en dehors des nouvelles recettes. Une conversation par vidéo.
 
 # Nouvelles recettes
-- Objectif : renouveler les visuels. Le téléphone et les recettes de base ne servent que si le sujet s’y prête ; quand le sujet le permet, viser au moins une recette nouvelle par vidéo.
+- Objectif : renouveler les visuels pour qu’on ne sente jamais le recyclage en scrollant le compte. Les objets réels (téléphone) et la mascotte peuvent revenir. Les formes abstraites font partie du style, mais chaque vidéo a sa propre famille de formes : ne pas reprendre la forme abstraite dominante de la vidéo précédente, et en inventer de nouvelles régulièrement.
+- Recettes de première génération (pattern, dot, counter, context) : au plus une par vidéo.
+- Le téléphone et les recettes de base ne servent que si le sujet s’y prête ; quand le sujet le permet, viser au moins une recette nouvelle par vidéo.
 - Proposer à l’étape 1, créer seulement après ma validation (étape 2 bis).
 - Pour la créer, demande-moi les fichiers du moteur dont tu as besoin (registre des recettes, schéma des plans, une recette existante comme modèle) si tu ne les as pas déjà dans le Project. Ne devine jamais la structure du moteur.
 - Livre le ou les fichiers complets, en fichiers téléchargeables, avec leur chemin, et la ligne exacte à ajouter au registre et au schéma. Ne touche à rien d’autre dans le moteur.
@@ -83,6 +85,8 @@ Catalogue des recettes :
 - dot : un point. mode: fill | empty | fillToEmpty.
 - ground : un téléphone qui surgit d’une ligne, mécaniquement. pace: slow | fast.
 - context : un décor seul, centré, qui surgit du sol. kind: elevator | queue.
+- scene : petite illustration en trait d’encre avec couche rouge, qui apparaît en montant. kind: night (lit sous la lune, couverture qui respire, yeux ouverts) | memory (bulles qui remontent, grande bulle avec un personnage qui rougit) | blush (visage qui détourne le regard, joues qui rougissent, goutte, chaleur).
+- motif : forme abstraite en trait d’encre avec couche rouge. kind: spiral (spirale qui s’enroule) | ripples (ondes qui partent d’un point) | waves (lignes ondulées qui enflent) | knot (fil qui s’emmêle en se dessinant) | orbit (petites formes qui tournent autour d’un centre) | split (cercle qui se fend, une moitié rouge).
 - mascot : la mascotte de la chaîne, un litchi au style risographie (couche rouge décalée sous un trait d’encre, écailles, petite tige sèche), qui apparaît en fondu puis flotte doucement. mood: content | perplexe (penché, petit « ? ») | surpris | reveur (yeux fermés, bulle) | gene (regard de côté, goutte) ; size: small | medium | large ; position: center | bottom (le texte passe en haut) | corner (petite, dans un coin, pour accompagner un texte). Deux ou trois plans par vidéo au maximum, plutôt aux moments où le spectateur se reconnaît. Ex. : /* 4 */ { recipe: "mascot", bg: "cream", duration: 1.6, text: "Et pourtant… | tu recommences.", mood: "perplexe" },
 
 À éviter (rendu jugé raté) :
