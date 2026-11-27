@@ -200,7 +200,150 @@ const Split: React.FC<P> = ({ t }) => {
   );
 };
 
-export const Motif: React.FC<{ layer: MotifLayer; t: number; d: number }> = ({ layer, t }) => {
+
+/**
+ * Échange : deux formes se renvoient une balle en rythme, une courbe pointillée garde la trace.
+ * Vers le milieu du plan, la balle s'arrête en l'air entre les deux et tremble (le silence).
+ */
+const Rally: React.FC<P & { d: number }> = ({ t, d }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const cross = 0.42;
+  const start = 0.1;
+  const freezeAt = Math.max(0.9, d * 0.5);
+  const uf = Math.floor((freezeAt - start) / cross) + 0.5;
+  const u = Math.max(0, Math.min((t - start) / cross, uf));
+  const frozen = (t - start) / cross >= uf;
+  const hold = frozen ? t - (start + uf * cross) : 0;
+  const k = Math.floor(u);
+  const f = u - k;
+  const dir = k % 2 === 0 ? 1 : -1;
+  const reach = 195;
+  const bx = dir * mix(-reach, reach, f);
+  const by = -230 * 4 * f * (1 - f) + 40;
+  const shake = frozen ? Math.min(1, hold * 1.5) * 5 : 0;
+  const jx = shake * Math.sin(t * 47);
+  const jy = shake * Math.cos(t * 39);
+  // Choc : la forme qui vient de renvoyer la balle s'incline un instant
+  const hitL = frozen ? 0 : Math.max(0, 1 - ((t - start) % (cross * 2)) / 0.18) * (k % 2 === 0 ? 1 : 0);
+  const hitR = frozen ? 0 : Math.max(0, 1 - ((t - start - cross) % (cross * 2)) / 0.18) * (k % 2 === 1 ? 1 : 0);
+  const lean = frozen ? Math.min(1, hold * 2) * 6 : 0;
+  const paddle = "M 0,-150 C 60,-140 62,140 0,150 C -40,140 -42,-140 0,-150 Z";
+  const arc = `M ${-reach},40 Q 0,-420 ${reach},40`;
+  const pulse = frozen ? 1 + 0.25 * (0.5 + 0.5 * Math.sin(hold * 7)) : 1;
+  const ticks = [0, 1, 2, 3, 4, 5];
+  return (
+    <g>
+      {/* Trajectoire pointillée */}
+      <path d={arc} {...ink(pal.fg, 7)} strokeDasharray="2 26" opacity={0.45 * ramp(t, 0.1, 0.4)} />
+      {/* Les deux formes */}
+      {[
+        { x: -275, s: -1, hit: hitL },
+        { x: 275, s: 1, hit: hitR },
+      ].map((p, i) => (
+        <g key={i} transform={`translate(${p.x}, 40) rotate(${p.s * (12 * p.hit - lean)}) scale(${p.s}, 1)`}>
+          <path d={paddle} transform={`translate(${dx * 1.3 * p.s}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+          <path d={paddle} fill={pal.bg} />
+          <path d={paddle} {...ink(pal.fg, 8)} />
+        </g>
+      ))}
+      {/* Balle */}
+      <g transform={`translate(${bx + jx}, ${by + jy})`}>
+        <circle cx={dx} cy={dy} r={46 * pulse} fill={pal.shadow} opacity={0.92} />
+        <circle r={42} fill={pal.bg} />
+        <circle r={42} {...ink(pal.fg, 8)} />
+      </g>
+      {/* Petits traits de tension autour de la balle figée */}
+      {frozen
+        ? ticks.map((i) => {
+            const a = (i / ticks.length) * Math.PI * 2 + 0.3;
+            const p = ramp(hold, 0.15 + i * 0.05, 0.3);
+            const r1 = 66;
+            const r2 = 66 + 34 * p;
+            return (
+              <path
+                key={i}
+                d={`M ${bx + Math.cos(a) * r1},${by + Math.sin(a) * r1} L ${bx + Math.cos(a) * r2},${by + Math.sin(a) * r2}`}
+                {...ink(pal.fg, 5)}
+                opacity={p * (0.6 + 0.4 * Math.sin(hold * 9 + i))}
+              />
+            );
+          })
+        : null}
+    </g>
+  );
+};
+
+
+/**
+ * Lien qui s'effiloche : deux ronds reliés par un fil tressé qui se dessine,
+ * puis les brins se séparent au milieu, le brin rouge se détend et un « ? » apparaît.
+ */
+const Fray: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const draw = ramp(t, 0.15, 0.6);
+  const f = ramp(t, 0.75, 0.9, "inOut");
+  const q = ramp(t, 1.3, 0.35);
+  const span = 190;
+  const strand = (k: number) => {
+    const pts: [number, number][] = [];
+    for (let x = -span; x <= span; x += 5) {
+      const mid = Math.exp(-(x * x) / (2 * 65 * 65));
+      const tight = 9 * (1 - 0.7 * mid * f);
+      const y =
+        tight * Math.sin(x / 15 + (k * Math.PI * 2) / 3 + t * 0.8) +
+        (k - 1) * 50 * mid * f +
+        (k === 1 ? 28 * mid * f : 0) +
+        3 * mid * f * Math.sin(t * 5 + k);
+      pts.push([x, y]);
+    }
+    return toPath(pts);
+  };
+  const dash = { pathLength: 1, strokeDasharray: 1, strokeDashoffset: 1 - draw };
+  const ends = [-span - 58, span + 58];
+  const fibers = [
+    { x: -40, y: -42, a: -2.3 },
+    { x: 35, y: -46, a: -0.8 },
+    { x: -15, y: 62, a: 2.0 },
+    { x: 48, y: 58, a: 0.9 },
+  ];
+  return (
+    <g>
+      {[0, 2, 1].map((k) => (
+        <path key={k} d={strand(k)} {...ink(k === 1 ? pal.shadow : pal.fg, k === 1 ? 10 : 8)} {...dash} />
+      ))}
+      {fibers.map((b, i) => {
+        const p = ramp(t, 0.9 + i * 0.08, 0.5);
+        return (
+          <path
+            key={i}
+            d={`M ${b.x},${b.y} l ${Math.cos(b.a) * 18},${Math.sin(b.a) * 18}`}
+            transform={`translate(${Math.cos(b.a) * 20 * p}, ${Math.sin(b.a) * 20 * p})`}
+            {...ink(pal.fg, 4)}
+            opacity={p * 0.6}
+          />
+        );
+      })}
+      {ends.map((x, i) => {
+        const k = ramp(t, 0.02 + i * 0.1, 0.35);
+        return (
+          <g key={i} transform={`translate(${x}, 0) scale(${mix(0.6, 1, k)})`} opacity={k}>
+            <circle cx={dx * 1.2} cy={dy * 1.2} r={58} fill={pal.shadow} opacity={0.92} />
+            <circle r={58} fill={pal.bg} />
+            <circle r={58} {...ink(pal.fg, 8)} />
+          </g>
+        );
+      })}
+      <g transform={`translate(0, ${mix(-90, -110, q)}) scale(${mix(0.5, 1, q)})`} opacity={q}>
+        <path d="M -20,-62 C -20,-100 24,-100 24,-66 C 24,-42 2,-42 2,-18" {...ink(pal.fg, 8)} />
+        <circle cx={2} cy={8} r={6} fill={pal.fg} />
+      </g>
+    </g>
+  );
+};
+
+export const Motif: React.FC<{ layer: MotifLayer; t: number; d: number }> = ({ layer, t, d }) => {
   const lt = t - (layer.at ?? 0);
   const k = ramp(lt, 0, 0.4);
   const inner =
@@ -209,6 +352,8 @@ export const Motif: React.FC<{ layer: MotifLayer; t: number; d: number }> = ({ l
     layer.kind === "waves" ? <Waves t={lt} /> :
     layer.kind === "knot" ? <Knot t={lt} /> :
     layer.kind === "orbit" ? <Orbit t={lt} /> :
+    layer.kind === "fray" ? <Fray t={lt} /> :
+    layer.kind === "rally" ? <Rally t={lt} d={d - (layer.at ?? 0)} /> :
     <Split t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y}) scale(${layer.scale * mix(0.85, 1, k)})`} opacity={k}>

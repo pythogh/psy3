@@ -18,12 +18,12 @@ const mascotMood = z
   .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée");
 
 const sceneKind = z
-  .enum(["night", "memory", "blush", "covers", "heart"])
-  .describe("Scène : nuit (lit vu de dessus sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit), couverture (remontée jusqu’au nez), cœur (point rouge qui bat dans la poitrine)");
+  .enum(["night", "memory", "blush", "covers", "heart", "coffee", "metronome", "typing"])
+  .describe("Scène : nuit (lit vu de dessus sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit), couverture (remontée jusqu’au nez), cœur (point rouge qui bat dans la poitrine), café (deux collègues de profil attendent leur café, regards qui se croisent), metronome (balancier qui bat en rythme), typing (message lu, « en train d’écrire… » qui disparaît)");
 
 const motifKind = z
-  .enum(["spiral", "ripples", "waves", "knot", "orbit", "split"])
-  .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue");
+  .enum(["spiral", "ripples", "waves", "knot", "orbit", "split", "rally", "fray"])
+  .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue, échange (balle renvoyée qui reste suspendue), lien qui s’effiloche");
 
 const sfxName = z
   .enum(["tick", "pop", "whoosh", "rustle", "crack", "buzz", "thud"])

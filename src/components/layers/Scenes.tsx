@@ -235,6 +235,165 @@ const Heart: React.FC<P> = ({ t }) => {
   );
 };
 
+
+/**
+ * Café : deux collègues de profil, face à face de chaque côté d'une petite machine.
+ * La tasse se remplit goutte à goutte, ils fixent la tasse ; de temps en temps leurs regards
+ * se croisent, et ils les rebaissent aussitôt.
+ */
+const Coffee: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const fill = Math.min(0.85, 0.08 + t * 0.16);
+  const look = (s: number) => ramp(t, s, 0.12) * (1 - ramp(t, s + 0.4, 0.12));
+  const up = Math.max(look(1.0), look(2.5));
+  const drop = (t * 2.6) % 1;
+  // Machine sur le comptoir, au fond
+  const machine = "M -85,-150 L 85,-150 L 85,70 L -85,70 Z";
+  const cupY = 70;
+  const cup = `M -32,${cupY - 52} L -26,${cupY} L 26,${cupY} L 32,${cupY - 52} Z`;
+  const level = cupY - 50 * fill;
+  // Têtes de profil : la gauche regarde à droite, la droite regarde à gauche
+  const head = (cx: number, cy: number, f: number) =>
+    `M ${cx - 58 * f},${cy + 10} C ${cx - 62 * f},${cy - 70} ${cx + 48 * f},${cy - 78} ${cx + 56 * f},${cy - 14} ` +
+    `C ${cx + 60 * f},${cy - 6} ${cx + 74 * f},${cy + 4} ${cx + 60 * f},${cy + 14} ` +
+    `C ${cx + 58 * f},${cy + 46} ${cx + 30 * f},${cy + 66} ${cx - 2 * f},${cy + 64} C ${cx - 34 * f},${cy + 62} ${cx - 56 * f},${cy + 40} ${cx - 58 * f},${cy + 10} Z`;
+  const body = (cx: number, f: number) =>
+    `M ${cx - 118 * f},300 C ${cx - 122 * f},130 ${cx - 80 * f},50 ${cx - 10 * f},50 C ${cx + 60 * f},50 ${cx + 100 * f},130 ${cx + 96 * f},300 Z`;
+  const L = { cx: -222, cy: -12 };
+  const R = { cx: 222, cy: -6 };
+  const eye = (cx: number, cy: number, f: number) => ({ x: cx + 30 * f, y: cy - 14 + mix(9, 0, up) });
+  const eL = eye(L.cx, L.cy, 1);
+  const eR = eye(R.cx, R.cy, -1);
+  return (
+    <g>
+      {/* Comptoir et machine */}
+      <path d="M -330,70 L 330,70" {...ink(pal.fg, 6)} opacity={0.5} />
+      <path d={machine} transform={`translate(${dx}, ${dy})`} fill={pal.shadow} opacity={0.92} />
+      <path d={machine} fill={pal.bg} />
+      <path d={machine} {...ink(pal.fg, 7)} />
+      <rect x={-60} y={-130} width={120} height={44} rx={8} {...ink(pal.fg, 5)} />
+      <circle cx={-34} cy={-108} r={10} fill={pal.shadow} opacity={0.5 + 0.5 * Math.sin(t * 5)} />
+      <path d="M -12,-112 L 40,-112 M -12,-100 L 22,-100" {...ink(pal.fg, 4)} opacity={0.5} />
+      <path d="M -60,-60 L 60,-60 M 0,-60 L 0,-40" {...ink(pal.fg, 6)} />
+      {/* Goutte qui tombe, tasse qui se remplit très lentement */}
+      <ellipse cx={0} cy={mix(-34, level - 6, drop)} rx={4} ry={6} fill={pal.shadow} opacity={drop < 0.9 ? 1 : 0} />
+      <path d={`M -30,${level} L -27,${cupY - 2} L 27,${cupY - 2} L 30,${level} Z`} fill={pal.shadow} opacity={0.92} />
+      <path d={cup} {...ink(pal.fg, 6)} />
+      <path d={`M 32,${cupY - 42} C 50,${cupY - 42} 50,${cupY - 18} 30,${cupY - 18}`} {...ink(pal.fg, 5)} />
+      {/* Collègue de gauche : cheveux courts, sweat à capuche */}
+      <path d={body(L.cx, 1)} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+      <path d={body(L.cx, 1)} fill={pal.bg} />
+      <path d={body(L.cx, 1)} {...ink(pal.fg, 8)} />
+      <path d={`M ${L.cx - 70},72 C ${L.cx - 40},112 ${L.cx + 30},112 ${L.cx + 60},72`} {...ink(pal.fg, 5)} />
+      <path d={`M ${L.cx - 10},97 L ${L.cx - 14},147 M ${L.cx + 14},97 L ${L.cx + 12},142`} {...ink(pal.fg, 4)} />
+      <path d={head(L.cx, L.cy, 1)} fill={pal.bg} />
+      <path d={head(L.cx, L.cy, 1)} {...ink(pal.fg, 7)} />
+      <path d={`M ${L.cx - 60},${L.cy + 2} C ${L.cx - 70},${L.cy - 70} ${L.cx + 10},${L.cy - 100} ${L.cx + 52},${L.cy - 40} C ${L.cx + 20},${L.cy - 52} ${L.cx - 10},${L.cy - 30} ${L.cx - 24},${L.cy - 46} C ${L.cx - 34},${L.cy - 20} ${L.cx - 48},${L.cy - 8} ${L.cx - 60},${L.cy + 2} Z`} fill={pal.fg} />
+      <path d={`M ${L.cx - 22},${L.cy + 4} q -14,4 -10,20`} {...ink(pal.fg, 4)} />
+      <circle cx={eL.x} cy={eL.y} r={6} fill={pal.fg} />
+      <path d={`M ${L.cx + 30},${L.cy + 38} L ${L.cx + 46},${L.cy + 36}`} {...ink(pal.fg, 4)} />
+      {/* Collègue de droite : chignon, chemise à col */}
+      <path d={body(R.cx, -1)} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+      <path d={body(R.cx, -1)} fill={pal.bg} />
+      <path d={body(R.cx, -1)} {...ink(pal.fg, 8)} />
+      <path d={`M ${R.cx - 40},60 L ${R.cx - 5},105 L ${R.cx + 25},60 M ${R.cx - 5},105 L ${R.cx - 5},300`} {...ink(pal.fg, 5)} />
+      <circle cx={R.cx + 66} cy={R.cy - 52} r={30} fill={pal.bg} />
+      <circle cx={R.cx + 66} cy={R.cy - 52} r={30} {...ink(pal.fg, 7)} />
+      <path d={head(R.cx, R.cy, -1)} fill={pal.bg} />
+      <path d={head(R.cx, R.cy, -1)} {...ink(pal.fg, 7)} />
+      <path d={`M ${R.cx + 60},${R.cy + 10} C ${R.cx + 66},${R.cy - 60} ${R.cx - 10},${R.cy - 96} ${R.cx - 54},${R.cy - 30} C ${R.cx - 20},${R.cy - 50} ${R.cx + 20},${R.cy - 44} ${R.cx + 40},${R.cy - 20} C ${R.cx + 46},${R.cy - 6} ${R.cx + 52},${R.cy + 4} ${R.cx + 60},${R.cy + 10} Z`} fill={pal.fg} />
+      <circle cx={eR.x} cy={eR.y} r={6} fill={pal.fg} />
+      <path d={`M ${R.cx - 30},${R.cy + 38} L ${R.cx - 46},${R.cy + 36}`} {...ink(pal.fg, 4)} />
+      {/* Petit trait de gêne quand les regards se croisent */}
+      {[L.cx + 60, R.cx - 60].map((x, i) => (
+        <path key={i} d={`M ${x},${-92} l ${i ? -10 : 10},-22 M ${x + (i ? -24 : 24)},${-80} l ${i ? -18 : 18},-14`} {...ink(pal.fg, 5)} opacity={up} />
+      ))}
+    </g>
+  );
+};
+
+
+/**
+ * Métronome : le balancier bat régulièrement, un petit trait jaillit à chaque bout de course.
+ */
+const Metronome: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const period = 0.9;
+  const ph = (t / period) * Math.PI * 2;
+  const ang = 14 * Math.sin(ph);
+  const hit = Math.max(0, Math.abs(Math.sin(ph)) - 0.85) / 0.15;
+  const side = Math.sin(ph) > 0 ? 1 : -1;
+  const body = "M -150,230 L -70,-250 L 70,-250 L 150,230 Z";
+  return (
+    <g>
+      <path d={body} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+      <path d={body} fill={pal.bg} />
+      <path d={body} {...ink(pal.fg, 8)} />
+      <path d="M -112,120 L 112,120" {...ink(pal.fg, 6)} />
+      {[-60, -30, 0, 30, 60].map((x, i) => (
+        <path key={i} d={`M ${x},${-170 + Math.abs(x) * 0.2} l ${x * 0.08},16`} {...ink(pal.fg, 4)} opacity={0.5} />
+      ))}
+      <g transform={`rotate(${ang}, 0, 120)`}>
+        <path d="M 0,120 L 0,-200" {...ink(pal.fg, 9)} />
+        <rect x={-15} y={-115} width={30} height={30} transform={`translate(${dx * 0.6}, ${dy * 0.6})`} fill={pal.shadow} />
+        <rect x={-15} y={-115} width={30} height={30} {...ink(pal.fg, 5)} />
+      </g>
+      <circle cx={0} cy={120} r={11} fill={pal.fg} />
+      <g opacity={hit}>
+        <path d={`M ${side * 110},-215 l ${side * 26},-14 M ${side * 118},-175 l ${side * 30},0`} {...ink(pal.fg, 5)} />
+      </g>
+    </g>
+  );
+};
+
+
+/**
+ * Écrit… : ton message est envoyé et marqué lu ; en face, les trois petits points
+ * « en train d'écrire » apparaissent, sautillent… puis disparaissent sans réponse.
+ */
+const Typing: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const mine = Math.max(0, springy(t, 0, 0.7));
+  const seen = ramp(t, 0.4, 0.25);
+  const showA = ramp(t, 0.65, 0.2) * (1 - ramp(t, 1.55, 0.3));
+  const showB = ramp(t, 2.15, 0.2) * (1 - ramp(t, 2.75, 0.3));
+  const show = Math.max(showA, showB);
+  const quiet = ramp(t, 1.7, 0.4) * (1 - showB);
+  const me = "M -140,-260 L 200,-260 C 230,-260 240,-240 240,-210 L 240,-130 C 240,-100 230,-85 200,-85 L 170,-85 L 180,-40 L 120,-85 L -140,-85 C -170,-85 -180,-100 -180,-130 L -180,-210 C -180,-240 -170,-260 -140,-260 Z";
+  const them = "M -190,40 L -10,40 C 15,40 25,55 25,80 L 25,120 C 25,145 15,160 -10,160 L -190,160 C -215,160 -225,145 -225,120 L -225,80 C -225,55 -215,40 -190,40 Z";
+  const check = (x: number) => `M ${x},-48 l 12,12 l 22,-26`;
+  return (
+    <g>
+      {/* Ton message, envoyé */}
+      <g transform={`translate(0, ${(1 - mine) * 40})`} opacity={Math.min(1, mine)}>
+        <path d={me} transform={`translate(${dx * 1.2}, ${dy * 1.2})`} fill={pal.shadow} opacity={0.92} />
+        <path d={me} fill={pal.bg} />
+        <path d={me} {...ink(pal.fg, 8)} />
+        <path d="M -140,-205 L 190,-205 M -140,-150 L 80,-150" {...ink(pal.fg, 7)} opacity={0.45} />
+      </g>
+      {/* Lu */}
+      <g opacity={seen}>
+        <path d={check(60)} {...ink(pal.shadow, 7)} />
+        <path d={check(82)} {...ink(pal.shadow, 7)} />
+      </g>
+      {/* En face : « en train d'écrire… » */}
+      <g opacity={show} transform={`translate(-100, 100) scale(${mix(0.85, 1, show)}) translate(100, -100)`}>
+        <path d={them} transform={`translate(${dx}, ${dy})`} fill={pal.shadow} opacity={0.92} />
+        <path d={them} fill={pal.bg} />
+        <path d={them} {...ink(pal.fg, 8)} />
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx={-150 + i * 55} cy={100 - 10 * Math.max(0, Math.sin(t * 9 - i * 0.9))} r={14} fill={pal.fg} />
+        ))}
+      </g>
+      {/* Plus rien : la place vide, en pointillés */}
+      <path d={them} {...ink(pal.fg, 5)} strokeDasharray="4 18" opacity={quiet * 0.5} />
+    </g>
+  );
+};
+
 export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ layer, t }) => {
   const lt = t - (layer.at ?? 0);
   const k = ramp(lt, 0, 0.45);
@@ -243,6 +402,9 @@ export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ l
     layer.kind === "memory" ? <Memory t={lt} /> :
     layer.kind === "covers" ? <Covers t={lt} /> :
     layer.kind === "heart" ? <Heart t={lt} /> :
+    layer.kind === "coffee" ? <Coffee t={lt} /> :
+    layer.kind === "metronome" ? <Metronome t={lt} /> :
+    layer.kind === "typing" ? <Typing t={lt} /> :
     <Blush t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y + mix(50, 0, k)}) scale(${layer.scale})`} opacity={k}>
