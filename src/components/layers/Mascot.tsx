@@ -97,6 +97,61 @@ const Face: React.FC<{ mood: MascotMood; blink: number; ink: string }> = ({
         </>
       );
 
+    case "envie":
+      return (
+        <>
+          {[-15, 15].map((cx) => (
+            <path
+              key={cx}
+              d={`M ${cx},${-9 * blink - 2} L ${cx + 2},-4 L ${cx + 7},-2 L ${cx + 2},0 L ${cx},${7 * blink - 2} L ${cx - 2},0 L ${cx - 7},-2 L ${cx - 2},-4 Z`}
+              fill={RISO_RED}
+              stroke={ink}
+              strokeWidth={1.6}
+              strokeLinejoin="round"
+            />
+          ))}
+          <path d="M -7,8 Q 0,17 7,8 Z" fill={ink} stroke={ink} strokeWidth={1.8} strokeLinejoin="round" />
+        </>
+      );
+
+    case "eureka":
+      return (
+        <>
+          <circle cx={-15} cy={-2} r={4.6 * blink} fill={ink} />
+          <circle cx={15} cy={-2} r={4.6 * blink} fill={ink} />
+          <circle cx={-13.5} cy={-3.5} r={1.4 * blink} fill={PAPER} />
+          <circle cx={16.5} cy={-3.5} r={1.4 * blink} fill={PAPER} />
+          <path d="M -22,-13 Q -15,-20 -8,-14" {...strokeProps} strokeWidth={2.2} />
+          <path d="M 8,-14 Q 15,-20 22,-13" {...strokeProps} strokeWidth={2.2} />
+          <path d="M -8,7 L 8,7 Q 8,18 0,18 Q -8,18 -8,7 Z" fill={ink} stroke={ink} strokeWidth={1.6} strokeLinejoin="round" />
+          <path d="M -4,15 Q 0,12 4,15" stroke={RISO_RED} strokeWidth={2.4} fill="none" strokeLinecap="round" />
+        </>
+      );
+
+    case "stresse":
+      return (
+        <>
+          <circle cx={-15} cy={-2} r={6} {...strokeProps} strokeWidth={2.1} />
+          <circle cx={15} cy={-2} r={6} {...strokeProps} strokeWidth={2.1} />
+          <circle cx={-15} cy={-2} r={2.1 * blink} fill={ink} />
+          <circle cx={15} cy={-2} r={2.1 * blink} fill={ink} />
+          <line x1={-22} y1={-11} x2={-10} y2={-15} {...strokeProps} strokeWidth={2.2} />
+          <line x1={10} y1={-15} x2={22} y2={-11} {...strokeProps} strokeWidth={2.2} />
+          <path d="M -9,12 L -5,9 L -1,12 L 3,9 L 7,12" {...strokeProps} strokeWidth={2} />
+        </>
+      );
+
+    case "agace":
+      return (
+        <>
+          <path d={`M -20,-3 A 5 ${5 * blink} 0 0 0 -10,-3 Z`} fill={ink} stroke={ink} strokeWidth={1.4} strokeLinejoin="round" />
+          <path d={`M 10,-3 A 5 ${5 * blink} 0 0 0 20,-3 Z`} fill={ink} stroke={ink} strokeWidth={1.4} strokeLinejoin="round" />
+          <line x1={-22} y1={-13} x2={-9} y2={-8} {...strokeProps} strokeWidth={2.6} />
+          <line x1={9} y1={-8} x2={22} y2={-13} {...strokeProps} strokeWidth={2.6} />
+          <path d="M -7,13 Q 0,7 7,13" {...strokeProps} strokeWidth={2.2} />
+        </>
+      );
+
     default:
       return (
         <>
@@ -176,6 +231,97 @@ const Accessory: React.FC<{
     );
   }
 
+  if (mood === "envie") {
+    const sparks = [
+      { x: -62, y: -40, ph: 0 },
+      { x: 64, y: -58, ph: 1.7 },
+      { x: 70, y: 12, ph: 3.1 },
+    ];
+    return (
+      <g transform={`scale(${pop})`}>
+        {sparks.map((s, i) => {
+          const k = 0.6 + 0.4 * Math.sin(t * 5 + s.ph);
+          const d = "M 0,-9 L 2,-2 L 9,0 L 2,2 L 0,9 L -2,2 L -9,0 L -2,-2 Z";
+          return (
+            <g key={i} transform={`translate(${s.x} ${s.y}) scale(${k})`}>
+              <path d={d} fill={RISO_RED} transform="translate(1.5 1.2)" />
+              <path d={d} fill="none" stroke={ink} strokeWidth={1.6} strokeLinejoin="round" />
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
+
+  if (mood === "eureka") {
+    const bounce = 1 + 0.08 * Math.max(0, Math.sin(t * 6));
+    return (
+      <g transform={`translate(-40 -88) scale(${pop * bounce})`}>
+        {[-1, 0, 1].map((k) => (
+          <line key={k} x1={k * 16} y1={-30 + Math.abs(k) * 8} x2={k * 24} y2={-40 + Math.abs(k) * 6} stroke={ink} strokeWidth={2} strokeLinecap="round" />
+        ))}
+        <text x={2.5} y={8} textAnchor="middle" fontSize={40} fontWeight={800} fontFamily="Georgia, serif" fill={RISO_RED}>
+          !
+        </text>
+        <text x={0} y={6} textAnchor="middle" fontSize={40} fontWeight={800} fontFamily="Georgia, serif" fill="none" stroke={ink} strokeWidth={1.6}>
+          !
+        </text>
+      </g>
+    );
+  }
+
+  if (mood === "stresse") {
+    const dropPath = "M 0,-10 C 4,-3 7,1 7,5 A 7,7 0 0 1 -7,5 C -7,1 -4,-3 0,-10 Z";
+    const a = (t * 4) % 5;
+    const b = (t * 4 + 2.5) % 5;
+    return (
+      <g transform={`scale(${pop})`}>
+        <g transform={`translate(-48 ${-30 + a})`}>
+          <path d={dropPath} fill={PAPER} transform="translate(2, 1.5)" />
+          <path d={dropPath} fill="none" stroke={ink} strokeWidth={1.8} />
+        </g>
+        <g transform={`translate(50 ${-36 + b})`}>
+          <path d={dropPath} fill={PAPER} transform="translate(2, 1.5)" />
+          <path d={dropPath} fill="none" stroke={ink} strokeWidth={1.8} />
+        </g>
+        <path d="M -72,-6 Q -77,4 -72,14 M -80,-10 Q -87,4 -80,18" fill="none" stroke={ink} strokeWidth={1.8} strokeLinecap="round" opacity={0.5 + 0.5 * Math.sin(t * 14)} />
+        <path d="M 72,-6 Q 77,4 72,14 M 80,-10 Q 87,4 80,18" fill="none" stroke={ink} strokeWidth={1.8} strokeLinecap="round" opacity={0.5 + 0.5 * Math.cos(t * 14)} />
+      </g>
+    );
+  }
+
+  if (mood === "agace") {
+    const puff = (ph: number) => {
+      const k = (t * 0.9 + ph) % 1;
+      return { y: -k * 26, o: Math.sin(k * Math.PI) };
+    };
+    const p1 = puff(0);
+    const p2 = puff(0.5);
+    const vein = "M -6,-2 Q -2,-2 -2,-6 M 2,-6 Q 2,-2 6,-2 M 6,2 Q 2,2 2,6 M -2,6 Q -2,2 -6,2";
+    return (
+      <g transform={`scale(${pop})`}>
+        <g transform="translate(-40 -58) scale(1.6)">
+          <path d={vein} fill="none" stroke={RISO_RED} strokeWidth={3} strokeLinecap="round" transform="translate(1 1)" />
+          <path d={vein} fill="none" stroke={ink} strokeWidth={1.5} strokeLinecap="round" />
+        </g>
+        {[
+          { x: 46, p: p1 },
+          { x: 62, p: p2 },
+        ].map((c, i) => (
+          <path
+            key={i}
+            d={`M ${c.x},${-70 + c.p.y} q -6,-8 0,-14 q 6,-6 0,-14`}
+            fill="none"
+            stroke={ink}
+            strokeWidth={2}
+            strokeLinecap="round"
+            opacity={c.p.o}
+          />
+        ))}
+      </g>
+    );
+  }
+
   return null;
 };
 
@@ -202,8 +348,10 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
   const floatY = enterLift + Math.sin(t * 1.8) * 3.2;
 
   // Inclinaison et regard subtils
-  const targetTilt = mood === "perplexe" ? -6 : mood === "gene" ? 4 : 0;
-  const tilt = targetTilt + Math.sin(t * 1.1) * 1.6;
+  const targetTilt = mood === "perplexe" ? -6 : mood === "gene" ? 4 : mood === "agace" ? 3 : mood === "envie" ? -3 : 0;
+  // Stressé : petit tremblement nerveux
+  const jitter = mood === "stresse" ? Math.sin(t * 38) * 1.3 : 0;
+  const tilt = targetTilt + Math.sin(t * 1.1) * 1.6 + jitter;
 
   const lookX =
     mood === "perplexe"
@@ -214,7 +362,7 @@ export const Mascot: React.FC<{ layer: MascotLayer; t: number; d: number }> = ({
   const lookY =
     mood === "surpris"
       ? -2.5
-      : mood === "reveur"
+      : mood === "reveur" || mood === "eureka"
       ? -1.5
       : Math.cos(t * 1.3) * 1.2;
 

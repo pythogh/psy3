@@ -1,8 +1,8 @@
 import React from "react";
 import type { Layer } from "../../data/types";
-import { usePalette } from "../../theme/ThemeContext";
+import { usePalette, useTheme } from "../../theme/ThemeContext";
 import { useRiso } from "../riso";
-import { mix, ramp } from "./anim";
+import { mix, ramp, springy } from "./anim";
 
 /*
  * MOTIFS : formes abstraites en trait d'encre, avec couche rouge décalée (riso).
@@ -343,8 +343,150 @@ const Fray: React.FC<P> = ({ t }) => {
   );
 };
 
+
+/**
+ * Étiquette de prix : elle tombe au bout de sa ficelle et se balance, le prix est barré en rouge,
+ * rebarré, puis gribouillé, et un macaron « −50 % » s'écrase dans le coin (la promo, l'affaire).
+ */
+const Tag: React.FC<P & { cue?: number }> = ({ t, cue }) => {
+  // Le macaron s'écrase à l'instant clé : début du plan suivant si l'étiquette y est prolongée
+  const stickAt = cue ?? 1.35;
+  const pal = usePalette();
+  const theme = useTheme();
+  const { dx, dy } = useRiso();
+  const drop = springy(t, 0, 0.6);
+  const swing = -8 + 16 * Math.exp(-2.6 * t) * Math.cos(t * 6.5);
+  const body = "M -250,-55 L -180,-120 L 225,-120 Q 250,-120 250,-95 L 250,95 Q 250,120 225,120 L -180,120 L -250,55 Z";
+  const strikes = [
+    { d: "M -95,-5 C -10,-25 80,-40 175,-55", at: 0.55 },
+    { d: "M -90,-60 C 0,-35 90,-10 180,15", at: 0.8 },
+    { d: "M -80,-30 L 165,-75 L -70,15 L 170,-35 L -60,45 L 160,5", at: 1.0 },
+  ];
+  const burst: string = (() => {
+    const pts: [number, number][] = [];
+    for (let i = 0; i < 28; i++) {
+      const a = (i / 28) * Math.PI * 2;
+      const r = i % 2 === 0 ? 118 : 94;
+      pts.push([Math.cos(a) * r, Math.sin(a) * r]);
+    }
+    return toPath(pts) + " Z";
+  })();
+  const sticker = ramp(t, stickAt + 0.08, 0.05);
+  const slam = sticker > 0 ? mix(1.7, 1, springy(t, stickAt + 0.08, 0.45)) : 0;
+  const price = {
+    x: 45,
+    y: 48,
+    textAnchor: "middle" as const,
+    fontFamily: theme.font.family,
+    fontSize: 150,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+  };
+  return (
+    <g transform={`translate(0, ${mix(-520, 0, drop)})`}>
+      {/* Ficelle qui part du haut */}
+      <path d="M -175,0 C -190,-120 -230,-200 -205,-330" {...ink(pal.fg, 5)} transform={`rotate(${swing}, -205, -330)`} />
+      <g transform={`rotate(${swing}, -205, -330)`}>
+        <path d={body} transform={`translate(${dx * 1.4}, ${dy * 1.4})`} fill={pal.shadow} opacity={0.92} />
+        <path d={body} fill={pal.bg} />
+        <path d={body} {...ink(pal.fg, 8)} />
+        <circle cx={-175} cy={0} r={17} fill={pal.bg} />
+        <circle cx={-175} cy={0} r={17} {...ink(pal.fg, 6)} />
+        {/* Le prix */}
+        <text {...price} fill={pal.fg}>80 €</text>
+        {/* Barré, rebarré, gribouillé */}
+        {strikes.map((s, i) => {
+          const p = ramp(t, s.at, i === 2 ? 0.35 : 0.18, "linear");
+          const dash = { pathLength: 1, strokeDasharray: 1, strokeDashoffset: 1 - p };
+          return (
+            <g key={i}>
+              <path d={s.d} {...ink(pal.shadow, i === 2 ? 13 : 17)} {...dash} />
+              <path d={s.d} {...ink(pal.fg, 4)} {...dash} transform="translate(-4, -3)" />
+            </g>
+          );
+        })}
+        {/* Macaron « −50 % » qui s'écrase dans le coin */}
+        <g transform={`translate(195, -125) rotate(14) scale(${slam})`} opacity={sticker}>
+          <path d={burst} transform={`translate(${dx}, ${dy})`} fill={pal.fg} opacity={0.9} />
+          <path d={burst} fill={pal.shadow} />
+          <path d={burst} {...ink(pal.fg, 6)} />
+          <text x={0} y={22} textAnchor="middle" fontFamily={theme.font.family} fontSize={50} fontWeight={800} fill={pal.fg}>
+            −50 %
+          </text>
+        </g>
+      </g>
+    </g>
+  );
+};
+
+/**
+ * Balance : la même pièce tombe de chaque côté, « + » à gauche (gain), « − » à droite (perte, en rouge).
+ * Quand la pièce rouge tombe, la balance s'écrase de son côté (une perte pèse plus lourd).
+ */
+const Scale: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const { dx, dy } = useRiso();
+  const leftIn = ramp(t, 0.15, 0.3, "linear");
+  const rightIn = ramp(t, 0.6, 0.3, "linear");
+  const s = Math.max(0, springy(t, 0.9, 0.7));
+  const tilt = -5 * ramp(t, 0.45, 0.25) * (1 - Math.min(1, s)) + 17 * s;
+  const a = (tilt * Math.PI) / 180;
+  const pivot = { x: 0, y: -170 };
+  const arm = 230;
+  const ends = [
+    { x: pivot.x - arm * Math.cos(a), y: pivot.y - arm * Math.sin(a) },
+    { x: pivot.x + arm * Math.cos(a), y: pivot.y + arm * Math.sin(a) },
+  ];
+  const fall = (p: number) => -460 * (1 - p * p);
+  const thud = ramp(t, 0.9, 0.12) * (1 - ramp(t, 1.25, 0.4));
+  const base = "M -115,235 L 115,235 L 72,198 L -72,198 Z";
+  return (
+    <g>
+      {/* Pied et socle */}
+      <path d={base} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+      <path d={base} fill={pal.bg} />
+      <path d={base} {...ink(pal.fg, 8)} />
+      <path d={`M 0,198 L 0,${pivot.y}`} {...ink(pal.fg, 9)} />
+      {/* Fléau */}
+      <path d={`M ${ends[0].x},${ends[0].y} L ${ends[1].x},${ends[1].y}`} {...ink(pal.fg, 9)} />
+      <circle cx={pivot.x} cy={pivot.y} r={17} fill={pal.bg} />
+      <circle cx={pivot.x} cy={pivot.y} r={17} {...ink(pal.fg, 7)} />
+      {/* Plateaux suspendus, avec leurs pièces */}
+      {ends.map((e, i) => {
+        const panY = e.y + 150;
+        const bowl = `M ${e.x - 88},${panY} Q ${e.x},${panY + 70} ${e.x + 88},${panY} Z`;
+        const p = i === 0 ? leftIn : rightIn;
+        const cy = panY - 40 + fall(p);
+        const red = i === 1;
+        return (
+          <g key={i}>
+            <path d={`M ${e.x},${e.y} L ${e.x - 82},${panY} M ${e.x},${e.y} L ${e.x + 82},${panY}`} {...ink(pal.fg, 4)} />
+            <g opacity={p > 0 ? 1 : 0}>
+              {red ? <circle cx={e.x + dx * 1.4} cy={cy + dy * 1.4} r={46} fill={pal.shadow} opacity={0.92} /> : null}
+              <circle cx={e.x} cy={cy} r={46} fill={red ? pal.shadow : pal.bg} />
+              <circle cx={e.x} cy={cy} r={46} {...ink(pal.fg, 7)} />
+              <path d={red ? `M ${e.x - 20},${cy} L ${e.x + 20},${cy}` : `M ${e.x - 20},${cy} L ${e.x + 20},${cy} M ${e.x},${cy - 20} L ${e.x},${cy + 20}`} {...ink(pal.fg, 8)} />
+            </g>
+            <path d={bowl} transform={`translate(${dx}, ${dy})`} fill={pal.shadow} opacity={0.6} />
+            <path d={bowl} fill={pal.bg} />
+            <path d={bowl} {...ink(pal.fg, 7)} />
+          </g>
+        );
+      })}
+      {/* Petits traits du choc, sous le plateau rouge */}
+      {[-1, 0, 1].map((k) => {
+        const x = ends[1].x + k * 70;
+        const y = ends[1].y + 150 + 62 - Math.abs(k) * 18;
+        return (
+          <path key={k} d={`M ${x + k * 6},${y} L ${x + k * 22},${y + 34}`} {...ink(pal.fg, 6)} opacity={thud} />
+        );
+      })}
+    </g>
+  );
+};
+
 export const Motif: React.FC<{ layer: MotifLayer; t: number; d: number }> = ({ layer, t, d }) => {
-  const lt = t - (layer.at ?? 0);
+  const lt = t - (layer.at ?? 0) + (layer.from ?? 0);
   const k = ramp(lt, 0, 0.4);
   const inner =
     layer.kind === "spiral" ? <Spiral t={lt} /> :
@@ -354,6 +496,8 @@ export const Motif: React.FC<{ layer: MotifLayer; t: number; d: number }> = ({ l
     layer.kind === "orbit" ? <Orbit t={lt} /> :
     layer.kind === "fray" ? <Fray t={lt} /> :
     layer.kind === "rally" ? <Rally t={lt} d={d - (layer.at ?? 0)} /> :
+    layer.kind === "tag" ? <Tag t={lt} cue={layer.cue} /> :
+    layer.kind === "scale" ? <Scale t={lt} /> :
     <Split t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y}) scale(${layer.scale * mix(0.85, 1, k)})`} opacity={k}>

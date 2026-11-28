@@ -14,16 +14,16 @@ const range = (min: number, max: number, _step?: number) => z.tuple([z.number().
 const background = z.enum(["cream", "ink", "accent"]).describe("Fond du plan : crème, encre ou couleur d’accent");
 const paletteColor = z.enum(["fg", "accent", "muted", "bg", "shadow", "screen"]);
 const mascotMood = z
-  .enum(["content", "perplexe", "surpris", "reveur", "gene"])
-  .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée");
+  .enum(["content", "perplexe", "surpris", "reveur", "gene", "envie", "eureka", "stresse", "agace"])
+  .describe("Humeur de la mascotte : contente, perplexe, surprise, rêveuse, gênée, envie (yeux étoiles), eurêka (« ! »), stressée (tremble, gouttes), agacée (sourcils froncés, fumée)");
 
 const sceneKind = z
-  .enum(["night", "memory", "blush", "covers", "heart", "coffee", "metronome", "typing"])
-  .describe("Scène : nuit (lit vu de dessus sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit), couverture (remontée jusqu’au nez), cœur (point rouge qui bat dans la poitrine), café (deux collègues de profil attendent leur café, regards qui se croisent), metronome (balancier qui bat en rythme), typing (message lu, « en train d’écrire… » qui disparaît)");
+  .enum(["night", "memory", "blush", "covers", "heart", "coffee", "metronome", "typing", "receipt", "cart", "pay"])
+  .describe("Scène : nuit (lit vu de dessus sous la lune), souvenir (bulle qui remonte), rougeur (visage qui rougit), couverture (remontée jusqu’au nez), cœur (point rouge qui bat dans la poitrine), café (deux collègues de profil attendent leur café, regards qui se croisent), metronome (balancier qui bat en rythme), typing (message lu, « en train d’écrire… » qui disparaît), receipt (ticket de caisse qui se déroule sans fin, total sur bandeau rouge), cart (panier en ligne avec chrono rouge « Réservé encore »), pay (paiement en un geste : feuille de paiement, double clic, coche)");
 
 const motifKind = z
-  .enum(["spiral", "ripples", "waves", "knot", "orbit", "split", "rally", "fray"])
-  .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue, échange (balle renvoyée qui reste suspendue), lien qui s’effiloche");
+  .enum(["spiral", "ripples", "waves", "knot", "orbit", "split", "rally", "fray", "tag", "scale"])
+  .describe("Motif abstrait : spirale, ondes, vagues, pelote, orbite, forme fendue, échange (balle renvoyée qui reste suspendue), lien qui s’effiloche, étiquette de prix barrée avec macaron −50 %, balance qui penche du côté de la perte");
 
 const sfxName = z
   .enum(["tick", "pop", "whoosh", "rustle", "crack", "buzz", "thud"])
@@ -183,6 +183,8 @@ const sceneLayer = z.object({
   y: px.describe("Centre de la scène (px)"),
   scale: z.number().min(0.1).max(4).describe("Échelle (environ 600 px de large à 1)"),
   at: seconds().optional().describe("Instant d'apparition (s)"),
+  from: seconds(60).optional().describe("Avance de l'animation (s) : reprise d'un plan précédent, calculée automatiquement"),
+  cue: seconds(60).optional().describe("Instant clé de l'animation (s), calculé automatiquement quand le plan suivant la prolonge"),
 });
 
 const motifLayer = z.object({
@@ -192,6 +194,8 @@ const motifLayer = z.object({
   y: px.describe("Centre du motif (px)"),
   scale: z.number().min(0.1).max(4).describe("Échelle (environ 600 px de large à 1)"),
   at: seconds().optional().describe("Instant d'apparition (s)"),
+  from: seconds(60).optional().describe("Avance de l'animation (s) : reprise d'un plan précédent, calculée automatiquement"),
+  cue: seconds(60).optional().describe("Instant clé de l'animation (s), calculé automatiquement quand le plan suivant la prolonge"),
 });
 
 export const layerSchema = z.discriminatedUnion("type", [
@@ -331,8 +335,8 @@ export const recipeShotSchema = z.discriminatedUnion("recipe", [
     size: z.enum(["small", "medium", "large"]).optional().describe("Taille de la mascotte"),
     position: z.enum(["center", "bottom", "corner"]).optional().describe("Place : centre, en bas (texte en haut), dans un coin"),
   }),
-  z.object({ recipe: z.literal("scene"), ...recipeCommon, kind: sceneKind }),
-  z.object({ recipe: z.literal("motif"), ...recipeCommon, kind: motifKind }),
+  z.object({ recipe: z.literal("scene"), ...recipeCommon, kind: sceneKind, continued: z.boolean().optional().describe("Le visuel reprend l’animation du plan précédent (même scène ou même motif) là où elle en était"), }),
+  z.object({ recipe: z.literal("motif"), ...recipeCommon, kind: motifKind, continued: z.boolean().optional().describe("Le visuel reprend l’animation du plan précédent (même scène ou même motif) là où elle en était"), }),
   z.object({
     recipe: z.literal("custom"),
     ...recipeCommon,

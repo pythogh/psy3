@@ -12,7 +12,7 @@ import { calculateVideoMetadata, DEFAULT_FPS } from "../../engine/timing";
  */
 export const Video01Composition: React.FC = () => (
   <Composition
-    id="verifier-telephone"
+    id="01-verifier-telephone"
     component={Video}
     schema={videoSchema}
     width={1080}
@@ -380,7 +380,7 @@ export const Video01Composition: React.FC = () => (
 
 export const Video01Vignette: React.FC = () => (
   <Composition
-    id="verifier-telephone-vignette"
+    id="01-verifier-telephone-vignette"
     component={Video}
     schema={videoSchema}
     width={1080}

@@ -1,6 +1,6 @@
 import React from "react";
 import type { Layer } from "../../data/types";
-import { usePalette } from "../../theme/ThemeContext";
+import { usePalette, useTheme } from "../../theme/ThemeContext";
 import { useRiso } from "../riso";
 import { mix, ramp, springy } from "./anim";
 
@@ -394,8 +394,185 @@ const Typing: React.FC<P> = ({ t }) => {
   );
 };
 
+/**
+ * Ticket de caisse : il sort de l'imprimante et se déroule sans fin vers le bas,
+ * les lignes défilent, puis la dernière ligne « TOTAL » s'imprime sur un bandeau rouge.
+ */
+const Receipt: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const theme = useTheme();
+  const { dx, dy } = useRiso();
+  const H = 560;
+  const L = H * ramp(t, 0.1, 1.3, "inOut");
+  const top = -262;
+  const sway = 1.5 * Math.sin(t * 2.2);
+  const total = ramp(t, 1.25, 0.3);
+  const teeth = Array.from({ length: 13 }, (_, i) => `L ${170 - (i + 1) * 26},${H + (i % 2 === 0 ? 14 : 0)}`).join(" ");
+  const paper = `M -170,0 L 170,0 L 170,${H} ${teeth} Z`;
+  const rows = [70, 115, 160, 205, 250, 295, 340, 385];
+  return (
+    <g>
+      <defs>
+        <clipPath id="receipt-out-clip">
+          <rect x={-400} y={top} width={800} height={1000} />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#receipt-out-clip)">
+        <g transform={`translate(0, ${top - H + L}) rotate(${sway}, 0, ${H - L})`}>
+          <path d={paper} transform={`translate(${dx * 1.3}, ${dy * 1.3})`} fill={pal.shadow} opacity={0.92} />
+          <path d={paper} fill={pal.bg} />
+          <path d={paper} {...ink(pal.fg, 7)} />
+          {rows.map((y, i) => (
+            <g key={y}>
+              <path d={`M -135,${y} L ${-5 - (i % 3) * 30},${y}`} {...ink(pal.muted, 11)} />
+              <path d={`M ${70 + (i % 2) * 15},${y} L 135,${y}`} {...ink(pal.muted, 11)} />
+            </g>
+          ))}
+          <path d={`M -140,${H - 130} L 140,${H - 130}`} {...ink(pal.fg, 4)} strokeDasharray="2 12" />
+          <g opacity={total}>
+            <rect x={-152} y={H - 105} width={304} height={62} rx={10} fill={pal.shadow} />
+            <text x={-136} y={H - 61} fontFamily={theme.font.family} fontSize={38} fontWeight={800} fill={pal.fg}>
+              TOTAL
+            </text>
+            <text x={136} y={H - 61} textAnchor="end" fontFamily={theme.font.family} fontSize={38} fontWeight={800} fill={pal.fg}>
+              40 €
+            </text>
+          </g>
+        </g>
+      </g>
+      {/* Fente de l'imprimante */}
+      <rect x={-215 + dx} y={top - 34 + dy} width={430} height={40} rx={20} fill={pal.shadow} opacity={0.92} />
+      <rect x={-215} y={top - 34} width={430} height={40} rx={20} fill={pal.fg} />
+      <path d={`M -180,${top} L 180,${top}`} {...ink(pal.bg, 5)} />
+    </g>
+  );
+};
+
+/**
+ * Chrono de panier : une fiche produit (un pull) dans un panier en ligne,
+ * avec un bandeau rouge « Réservé encore 09:59 » dont le chrono défile et clignote.
+ */
+const Cart: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const theme = useTheme();
+  const { dx, dy } = useRiso();
+  const panel = { x: -260, y: -210, w: 520, h: 400 };
+  const total = Math.max(0, 599 - Math.floor(Math.max(0, t - 0.35) / 0.1));
+  const mm = String(Math.floor(total / 60)).padStart(2, "0");
+  const ss = String(total % 60).padStart(2, "0");
+  const pill = ramp(t, 0.25, 0.3);
+  const blink = 0.55 + 0.45 * (0.5 + 0.5 * Math.cos(t * 9));
+  const pull = "M -40,-50 L -14,-58 C -8,-46 8,-46 14,-58 L 40,-50 L 62,-6 L 44,2 L 36,-18 L 36,48 L -36,48 L -36,-18 L -44,2 L -62,-6 Z";
+  return (
+    <g>
+      <rect x={panel.x + dx * 1.3} y={panel.y + dy * 1.3} width={panel.w} height={panel.h} rx={34} fill={pal.shadow} opacity={0.92} />
+      <rect x={panel.x} y={panel.y} width={panel.w} height={panel.h} rx={34} fill={pal.bg} />
+      <rect x={panel.x} y={panel.y} width={panel.w} height={panel.h} rx={34} {...ink(pal.fg, 8)} />
+      {/* Icône panier */}
+      <g transform="translate(-200, -150)">
+        <path d="M -30,-22 L -16,-22 L -4,22 L 34,22 L 44,-8 L -10,-8" {...ink(pal.fg, 6)} />
+        <circle cx={2} cy={36} r={6} fill={pal.fg} />
+        <circle cx={30} cy={36} r={6} fill={pal.fg} />
+      </g>
+      <path d="M -120,-160 L 60,-160" {...ink(pal.muted, 12)} />
+      {/* Fiche produit : le pull */}
+      <rect x={-225} y={-95} width={150} height={150} rx={20} {...ink(pal.fg, 6)} />
+      <g transform="translate(-150, -18)">
+        <path d={pull} transform={`translate(${dx * 0.8}, ${dy * 0.8})`} fill={pal.shadow} opacity={0.9} />
+        <path d={pull} {...ink(pal.fg, 5)} fill={pal.bg} />
+      </g>
+      <path d="M -40,-70 L 190,-70" {...ink(pal.fg, 14)} />
+      <path d="M -40,-25 L 120,-25" {...ink(pal.muted, 12)} />
+      <path d="M -40,20 L 80,20" {...ink(pal.muted, 12)} />
+      {/* Bandeau chrono */}
+      <g transform={`translate(0, ${mix(30, 0, pill)})`} opacity={pill}>
+        <rect x={-225} y={85} width={450} height={78} rx={39} fill={pal.shadow} opacity={blink} />
+        <rect x={-225} y={85} width={450} height={78} rx={39} {...ink(pal.fg, 6)} />
+        <circle cx={-182} cy={124} r={20} {...ink(pal.fg, 5)} />
+        <path d={`M -182,124 L ${-182 + 12 * Math.sin(t * 6)},${124 - 12 * Math.cos(t * 6)}`} {...ink(pal.fg, 4)} />
+        <text x={-148} y={139} fontFamily={theme.font.family} fontSize={42} fontWeight={700} fill={pal.fg} textLength={350} lengthAdjust="spacingAndGlyphs">
+          Réservé encore {mm}:{ss}
+        </text>
+      </g>
+    </g>
+  );
+};
+
+/**
+ * Paiement en un geste : sur un téléphone en trait d'encre, la feuille de paiement monte,
+ * double clic sur le bouton latéral, petit rond qui tourne, puis grande coche. Moins d'une seconde.
+ */
+const Pay: React.FC<P> = ({ t }) => {
+  const pal = usePalette();
+  const theme = useTheme();
+  const { dx, dy } = useRiso();
+  const sheet = ramp(t, 0.15, 0.35);
+  const press = (at: number) => Math.max(0, 1 - Math.abs(t - at) / 0.06);
+  const push = press(0.62) + press(0.8);
+  const spin = ramp(t, 0.88, 0.1) * (1 - ramp(t, 1.2, 0.08));
+  const done = Math.max(0, springy(t, 1.22, 0.45));
+  const check = ramp(t, 1.25, 0.25);
+  const card = ramp(t, 0.3, 0.3);
+  return (
+    <g>
+      {/* Téléphone */}
+      <rect x={-150 + dx * 1.3} y={-300 + dy * 1.3} width={300} height={600} rx={46} fill={pal.shadow} opacity={0.92} />
+      <rect x={-150} y={-300} width={300} height={600} rx={46} fill={pal.bg} />
+      <rect x={-150} y={-300} width={300} height={600} rx={46} {...ink(pal.fg, 9)} />
+      <path d="M -30,-272 L 30,-272" {...ink(pal.fg, 8)} />
+      {/* Bouton latéral, enfoncé deux fois */}
+      <rect x={150 - 6 * push} y={-200} width={14} height={80} rx={6} fill={pal.fg} />
+      {[0.62, 0.8].map((at, i) => {
+        const p = ramp(t, at, 0.25);
+        return (
+          <path key={i} d={`M ${188 + 26 * p},-190 C ${206 + 26 * p},-170 ${206 + 26 * p},-150 ${188 + 26 * p},-130`} {...ink(pal.fg, 5)} opacity={p * (1 - ramp(t, at + 0.25, 0.2))} />
+        );
+      })}
+      <text x={196} y={-212} fontFamily={theme.font.family} fontSize={44} fontWeight={800} fill={pal.fg} opacity={ramp(t, 0.8, 0.12) * (1 - ramp(t, 1.2, 0.2))}>
+        ×2
+      </text>
+      {/* Feuille de paiement qui monte */}
+      <g clipPath="url(#pay-screen-clip)">
+        <defs>
+          <clipPath id="pay-screen-clip">
+            <rect x={-150} y={-300} width={300} height={600} rx={46} />
+          </clipPath>
+        </defs>
+        <g transform={`translate(0, ${mix(420, 0, sheet)})`}>
+          <rect x={-150} y={-60} width={300} height={380} rx={30} fill={pal.bg} />
+          <path d="M -150,-30 C -150,-50 -135,-60 -115,-60 L 115,-60 C 135,-60 150,-50 150,-30" {...ink(pal.fg, 6)} />
+          <path d="M -30,-42 L 30,-42" {...ink(pal.muted, 8)} />
+          {/* Carte */}
+          <g transform={`translate(0, ${mix(30, 0, card)})`} opacity={card * (1 - check)}>
+            <rect x={-100 + dx} y={-10 + dy} width={200} height={124} rx={16} fill={pal.fg} opacity={0.85} />
+            <rect x={-100} y={-10} width={200} height={124} rx={16} fill={pal.shadow} />
+            <rect x={-100} y={-10} width={200} height={124} rx={16} {...ink(pal.fg, 6)} />
+            <rect x={-74} y={18} width={36} height={28} rx={6} {...ink(pal.fg, 4)} />
+            <path d="M -74,86 L 40,86" {...ink(pal.fg, 6)} />
+          </g>
+          <path d="M -90,165 L 20,165" {...ink(pal.muted, 10)} opacity={1 - check} />
+          {/* Petit rond qui tourne */}
+          <g opacity={spin} transform={`translate(0, 225) rotate(${t * 720})`}>
+            <path d="M 0,-24 A 24 24 0 1 1 -24,0" {...ink(pal.fg, 6)} />
+          </g>
+          {/* Coche */}
+          <g transform={`translate(0, 70) scale(${done})`} opacity={done > 0 ? 1 : 0}>
+            <circle cx={dx * 1.2} cy={dy * 1.2} r={78} fill={pal.fg} opacity={0.85} />
+            <circle r={78} fill={pal.shadow} />
+            <circle r={78} {...ink(pal.fg, 7)} />
+            <path d="M -34,2 L -8,28 L 38,-26" {...ink(pal.fg, 11)} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - check} />
+          </g>
+          <text x={0} y={215} textAnchor="middle" fontFamily={theme.font.family} fontSize={36} fontWeight={700} fill={pal.fg} opacity={check}>
+            Payé
+          </text>
+        </g>
+      </g>
+    </g>
+  );
+};
+
 export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ layer, t }) => {
-  const lt = t - (layer.at ?? 0);
+  const lt = t - (layer.at ?? 0) + (layer.from ?? 0);
   const k = ramp(lt, 0, 0.45);
   const inner =
     layer.kind === "night" ? <Night t={lt} /> :
@@ -405,6 +582,9 @@ export const Scene: React.FC<{ layer: SceneLayer; t: number; d: number }> = ({ l
     layer.kind === "coffee" ? <Coffee t={lt} /> :
     layer.kind === "metronome" ? <Metronome t={lt} /> :
     layer.kind === "typing" ? <Typing t={lt} /> :
+    layer.kind === "receipt" ? <Receipt t={lt} /> :
+    layer.kind === "cart" ? <Cart t={lt} /> :
+    layer.kind === "pay" ? <Pay t={lt} /> :
     <Blush t={lt} />;
   return (
     <g transform={`translate(${layer.x}, ${layer.y + mix(50, 0, k)}) scale(${layer.scale})`} opacity={k}>

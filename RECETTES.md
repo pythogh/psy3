@@ -43,6 +43,8 @@ Avec `textPos: "top"`, le visuel descend automatiquement dans la moitié basse.
 | `ground` | un téléphone qui surgit d'une ligne, mécaniquement | `pace` : slow, fast |
 | `context` | un décor seul, centré, qui surgit du sol | `kind` : elevator, queue |
 | `mascot` | la mascotte : un litchi en risographie (couche rouge décalée sous un trait d'encre, écailles, petite tige sèche), qui apparaît en fondu puis flotte doucement | `mood` : content, perplexe (penché, « ? »), surpris, reveur (yeux fermés, bulle), gene (regard de côté, goutte) · `size` : small, medium, large · `position` : center, bottom (texte en haut), corner (petite, dans un coin) |
+| `scene` | petite illustration en trait d'encre avec couche rouge, qui apparaît en montant | `kind` : night (lit vu de dessus sous la lune), blush (visage qui rougit), covers (couverture remontée jusqu'au nez), heart (point rouge qui bat dans la poitrine), coffee (deux collègues attendent leur café), metronome (balancier en rythme), typing (« en train d'écrire… » qui disparaît) |
+| `motif` | forme abstraite en trait d'encre avec couche rouge | `kind` : spiral, ripples, waves, knot, orbit, split (cercle qui se fend), rally (balle renvoyée qui reste suspendue), fray (lien qui s'effiloche), tag (étiquette de prix barrée, macaron −50 %), scale (balance qui penche du côté de la perte) |
 | `custom` | mode expert : calques détaillés (ex. mascotte combinée à un autre objet) | `layers`, `cameraDetail` |
 
 Deux plans `pattern` consécutifs avec la même `seed` montrent la même grille : utile pour couper une phrase en deux
@@ -72,6 +74,7 @@ Export : `npx remotion still src/index.ts <id>-vignette out/<id>-vignette.png --
 ## À éviter (rendu jugé raté)
 
 - `reach` (le bras) ;
+- `scene` avec `kind: "memory"` (la bulle de souvenir) ;
 - `context` avec `kind: "hourglass"` (le sablier) ;
 - `timeline` (barres mal posées sur l'axe) ;
 - `pattern` avec `close: true` (la grille déborde en haut à gauche) ;

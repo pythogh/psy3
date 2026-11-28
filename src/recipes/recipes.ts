@@ -74,6 +74,9 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
 
   let layers: Layer[] = [];
   let camera: Camera = CAMERAS[s.camera ?? (isWords ? "pull" : "push")](d);
+  // Visuel prolongé depuis le plan précédent : caméra immobile par défaut, sans saut
+  const continued = (s.recipe === "scene" || s.recipe === "motif") && !!s.continued;
+  if (continued && !s.camera) camera = { zoom: [1.015, 1.03] };
 
   switch (s.recipe) {
     case "phone":
@@ -235,4 +238,32 @@ export const expandShot = (s: RecipeShot, index: number): Shot => {
   };
 };
 
-export const expandShots = (shots: RecipeShot[]): Shot[] => shots.map(expandShot);
+/** Calque principal (scène ou motif) d'un plan développé. */
+const animLayer = (shot: Shot) =>
+  shot.layers.find((l): l is Extract<Layer, { type: "scene" | "motif" }> => l.type === "scene" || l.type === "motif");
+
+export const expandShots = (shots: RecipeShot[]): Shot[] => {
+  const out = shots.map(expandShot);
+  // Durées réelles (repères de synchro compris), pour prolonger une animation sur le plan suivant
+  const starts: number[] = [];
+  let cursor = 0;
+  shots.forEach((s) => {
+    const st = s.startAt ?? cursor;
+    starts.push(st);
+    cursor = st + s.duration;
+  });
+  const length = (i: number) => (shots[i + 1]?.startAt ?? starts[i] + shots[i].duration) - starts[i];
+  for (let i = 1; i < shots.length; i++) {
+    const s = shots[i];
+    if ((s.recipe !== "scene" && s.recipe !== "motif") || !s.continued) continue;
+    const prev = animLayer(out[i - 1]);
+    const cur = animLayer(out[i]);
+    if (!prev || !cur || prev.kind !== cur.kind) continue;
+    // Temps d'animation atteint à la fin du plan précédent
+    const end = length(i - 1) - (prev.at ?? 0) + (prev.from ?? 0);
+    prev.cue = end;
+    cur.from = end + (cur.at ?? 0);
+    cur.cue = end;
+  }
+  return out;
+};
